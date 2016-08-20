@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ImageTimer</string>
+    <string name="app_name">Picture Timer</string>
+    <string name="configure_activity_title">Configure</string>
 </resources>
