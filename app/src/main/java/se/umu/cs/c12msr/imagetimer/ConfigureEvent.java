@@ -1,5 +1,9 @@
 package se.umu.cs.c12msr.imagetimer;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,10 +14,15 @@ import android.widget.NumberPicker;
 
 public class ConfigureEvent extends AppCompatActivity {
 
+    public static final String HOURS_SET = "se.umu.cs.c12msr.imagetimer.hours";
+    public static final String MINUTES_SET = "se.umu.cs.c12msr.imagetimer.minutes";
+    public static final String SECONDS_SET = "se.umu.cs.c12msr.imagetimer.seconds";
+
     private ImageView mPictureView;
     private NumberPicker mHoursPicker;
     private NumberPicker mMinutesPicker;
     private NumberPicker mSecondsPicker;
+    private String imagePath;
 
 
     @Override
@@ -28,8 +37,8 @@ public class ConfigureEvent extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        //Intent intent = getIntent();
-        //final String imagePath = intent.getStringExtra(MainActivity.MESSAGE);
+        Intent intent = getIntent();
+        imagePath = intent.getStringExtra(MainActivity.MESSAGE);
 
         mHoursPicker = (NumberPicker) findViewById(R.id.activity_ce_hours_picker);
         mHoursPicker.setMaxValue(23);
@@ -47,7 +56,7 @@ public class ConfigureEvent extends AppCompatActivity {
         mSecondsPicker.setWrapSelectorWheel(false);
 
         mPictureView = (ImageView) findViewById(R.id.activity_configure_event_image);
-        /*
+
         mPictureView.post(new Runnable() {
             @Override
             public void run() {
@@ -76,15 +85,26 @@ public class ConfigureEvent extends AppCompatActivity {
                 mPictureView.setImageBitmap(bitmap);
             }
         });
-        */
+
     }
 
     public void confirmButtonPressed(View view) {
+        int hours = mHoursPicker.getValue();
+        int minutes = mMinutesPicker.getValue();
+        int seconds = mSecondsPicker.getValue();
 
+        Intent intent = new Intent();
+        intent.putExtra(HOURS_SET, hours);
+        intent.putExtra(MINUTES_SET, minutes);
+        intent.putExtra(SECONDS_SET, seconds);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
     }
 
     public void cancelButtonPressed(View view) {
-
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_CANCELED, intent);
+        finish();
     }
 
 

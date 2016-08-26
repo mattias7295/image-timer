@@ -14,6 +14,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/activity_main_image_grid"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/activity_main_tool_bar" />
+        android:layout_below="@+id/activity_main_tool_bar"
+        android:nestedScrollingEnabled="false"
+        android:numColumns="6"
+        android:stretchMode="columnWidth"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

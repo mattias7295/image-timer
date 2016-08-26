@@ -34,11 +34,13 @@
             android:paddingBottom="20dp">
 
             <NumberPicker
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_ce_hours_picker"
                 android:layout_gravity="center_vertical"
-                android:layout_marginRight="2dp" />
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:descendantFocusability="blocksDescendants"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -48,12 +50,14 @@
                 android:layout_gravity="center_vertical" />
 
             <NumberPicker
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_ce_minutes_picker"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp" />
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:descendantFocusability="blocksDescendants"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -63,11 +67,13 @@
                 android:layout_gravity="center_vertical" />
 
             <NumberPicker
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_ce_seconds_picker"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="2dp" />
+                android:layout_marginLeft="2dp"
+                android:layout_weight="1"
+                android:descendantFocusability="blocksDescendants"/>
 
         </LinearLayout>
 
@@ -85,7 +91,8 @@
                 android:id="@+id/activity_ce_cancel_button"
                 android:layout_gravity="center_vertical|bottom"
                 style="@style/Widget.AppCompat.Button"
-                android:layout_marginBottom="10dp" />
+                android:layout_marginBottom="10dp"
+                android:onClick="cancelButtonPressed" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -96,7 +103,8 @@
                 android:layout_gravity="center_vertical|bottom"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                android:onClick="confirmButtonPressed" />
         </LinearLayout>
 
     </LinearLayout>
