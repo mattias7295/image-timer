@@ -1,48 +1,43 @@
 package se.umu.cs.c12msr.imagetimer;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Mattias-stationary on 16-Aug-16.
  */
-public class ImageAdapter extends BaseAdapter {
+public class TimerEventAdapter extends BaseAdapter {
 
-    private final File[] mImages;
+    private final List<TimerEvent> mTimerEvents;
     private final LayoutInflater mInflater;
     private Context mContext;
+    private File extDir;
 
-    public ImageAdapter(Context context) {
-        File dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        mImages = dir.listFiles();
+    public TimerEventAdapter(Context context, List<TimerEvent> teList) {
+        extDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        this.mTimerEvents = teList;
         mInflater = LayoutInflater.from(context);
         mContext = context;
     }
 
     @Override
     public int getCount() {
-        return mImages.length;
+        return mTimerEvents.size();
     }
 
     @Override
-    public File getItem(int position) {
-        return mImages[position];
+    public TimerEvent getItem(int position) {
+        return mTimerEvents.get(position);
     }
 
     @Override
@@ -65,11 +60,18 @@ public class ImageAdapter extends BaseAdapter {
         picture = (ResizableImageView) frame.getTag(R.id.grid_item_picture);
         name = (TextView) frame.getTag(R.id.grid_item_text);
         name.setText("test");
-        Picasso.with(mContext).load(mImages[position]).resize(80,80).centerCrop().into(picture);
+
+        File imageFile = new File(extDir + getItem(position).getImageName());
+        Picasso.with(mContext).load(imageFile).resize(80,80).centerCrop().into(picture);
         return frame;
     }
-    /*
-    private void setPic(String mCurrentPhotoPath, ResizableImageView imageView) {
+
+    public void addEvent(TimerEvent te) {
+        mTimerEvents.add(te);
+        notifyDataSetChanged();
+    }
+
+/*    private void setPic(String mCurrentPhotoPath, ResizableImageView imageView) {
         // Get the dimensions of the ImageView
         int targetW = imageView.getWidth();
         int targetH = imageView.getHeight();
@@ -92,4 +94,4 @@ public class ImageAdapter extends BaseAdapter {
         imageView.setImageBitmap(bitmap);
     }*/
 
-}
+    }

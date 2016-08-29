@@ -1,34 +1,25 @@
 package se.umu.cs.c12msr.imagetimer;
 
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
     private GridView mPictureGrid;
     private String mCurrentPhotoPath;
-    private ArrayList<TimerEvent> mTimerEvents;
     private DatabaseHelper dbHelper;
 
     @Override
@@ -51,11 +41,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_tool_bar);
         setSupportActionBar(toolbar);
 
-        mTimerEvents = new ArrayList();
         dbHelper = new DatabaseHelper(getApplicationContext());
 
         mPictureGrid = (GridView) findViewById(R.id.activity_main_image_grid);
-        mPictureGrid.setAdapter(new ImageAdapter(this));
+        mPictureGrid.setAdapter(new TimerEventAdapter(this, new ArrayList<TimerEvent>()));
         mPictureGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -63,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
+
+
 
     }
 
@@ -81,7 +72,9 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_CONFIGURE_EVENT);
         } else if (requestCode == REQUEST_CONFIGURE_EVENT) {
             if (resultCode == RESULT_OK) {
-                createTimerEvent(data);
+                TimerEvent te = createTimerEvent(data);
+                ((TimerEventAdapter) mPictureGrid.getAdapter()).addEvent(te);
+                dbHelper.asyncInsert(te);
             } else if (resultCode == RESULT_CANCELED) {
 
             }
@@ -110,10 +103,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.action_settings:
-                Intent intent = new Intent(this, ConfigureEvent.class);
-                //intent.putExtra(MESSAGE, mCurrentPhotoPath);
-                startActivity(intent);
-                //Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -122,28 +111,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void createTimerEvent(Intent data) {
-        final int hours = data.getIntExtra(ConfigureEvent.HOURS_SET, 0);
-        final int minutes = data.getIntExtra(ConfigureEvent.MINUTES_SET, 0);
-        final int seconds = data.getIntExtra(ConfigureEvent.SECONDS_SET, 0);
-        mTimerEvents.add(new TimerEvent(mCurrentPhotoPath,
-                hours,
-                minutes,
-                seconds));
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_EVENT_ID, "test");
-                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_IMAGE, mCurrentPhotoPath);
-                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_HOURS, hours);
-                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_MINUTES, minutes);
-                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_SECONDS, seconds);
-                db.insert(DatabaseContract.TimerEventEntry.TABLE_NAME, null, values);
-            }
-        }).start();
+    private TimerEvent createTimerEvent(Intent data) {
+        int hours = data.getIntExtra(ConfigureEvent.HOURS_SET, 0);
+        int minutes = data.getIntExtra(ConfigureEvent.MINUTES_SET, 0);
+        int seconds = data.getIntExtra(ConfigureEvent.SECONDS_SET, 0);
+        TimerEvent te = new TimerEvent(mCurrentPhotoPath, hours, minutes, seconds);
+        return te;
     }
 
 
@@ -153,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
         String imageFileName = "JPEG_" + timeStamp + "_";
 
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        //File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */

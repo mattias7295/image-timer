@@ -5,48 +5,45 @@ package se.umu.cs.c12msr.imagetimer;
  */
 public class TimerEvent {
 
-    private String mImagePath;
+    private String mImageName;
     private int mHours;
     private int mMinutes;
     private int mSeconds;
 
 
-    public TimerEvent(String mImagePath, int mHours, int mMinutes, int mSeconds) {
-        this.mImagePath = mImagePath;
+    public TimerEvent(String mImageName, int mHours, int mMinutes, int mSeconds) {
+        this.mImageName = mImageName;
         this.mHours = mHours;
         this.mMinutes = mMinutes;
         this.mSeconds = mSeconds;
     }
 
-    public String getmImagePath() {
-        return mImagePath;
+    public String getImageName() {
+        return mImageName;
     }
 
-    public void setmImagePath(String mImagePath) {
-        this.mImagePath = mImagePath;
-    }
 
-    public int getmHours() {
+    public int getHours() {
         return mHours;
     }
 
-    public void setmHours(int mHours) {
-        this.mHours = mHours;
+    public void setHours(int hours) {
+        mHours = hours;
     }
 
-    public int getmMinutes() {
+    public int getMinutes() {
         return mMinutes;
     }
 
-    public void setmMinutes(int mMinutes) {
-        this.mMinutes = mMinutes;
+    public void setMinutes(int minutes) {
+        mMinutes = minutes;
     }
 
-    public int getmSeconds() {
+    public int getSeconds() {
         return mSeconds;
     }
 
-    public void setmSeconds(int mSeconds) {
-        this.mSeconds = mSeconds;
+    public void setSeconds(int seconds) {
+        mSeconds = seconds;
     }
 }
