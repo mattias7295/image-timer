@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Picture Timer</string>
-    <string name="configure_activity_title">Configure</string>
+    <string name="configure_activity_title">Set Time</string>
+    <string name="colon">:</string>
+
+    <string name="service_desc">Runs a countdown timer and notifies when finished</string>
 </resources>

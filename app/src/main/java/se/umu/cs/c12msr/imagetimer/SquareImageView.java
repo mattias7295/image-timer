@@ -8,19 +8,19 @@ import android.widget.ImageView;
 /**
  * Created by Mattias-stationary on 23-Aug-16.
  */
-public class ResizableImageView extends ImageView {
+public class SquareImageView extends ImageView {
 
     private Context mContext;
 
-    public ResizableImageView(Context context) {
+    public SquareImageView(Context context) {
         super(context);
     }
 
-    public ResizableImageView(Context context, AttributeSet attrs) {
+    public SquareImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public ResizableImageView(Context context, AttributeSet attrs, int defStyle) {
+    public SquareImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

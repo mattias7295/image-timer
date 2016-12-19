@@ -1,21 +1,60 @@
 package se.umu.cs.c12msr.imagetimer;
 
+import android.os.CountDownTimer;
+import android.widget.TextView;
+
+import java.util.Locale;
+
 /**
- * Created by Mattias-stationary on 17-Aug-16.
+ * Created by c12msr on 17-Aug-16.
  */
 public class TimerEvent {
 
+    private static final long COUNT_DOWN_INTERVAL = 1000; // 1 sec interval
+
     private String mImageName;
-    private int mHours;
-    private int mMinutes;
-    private int mSeconds;
+    private long mTime;
+    private long mId;
+    private CountDownTimer mTimer;
+    private TextView mTimertv;
+    private long mTimeLeft;
 
+    //TODO: temp image
+    private int mImageID;
 
-    public TimerEvent(String mImageName, int mHours, int mMinutes, int mSeconds) {
-        this.mImageName = mImageName;
-        this.mHours = mHours;
-        this.mMinutes = mMinutes;
-        this.mSeconds = mSeconds;
+    public TimerEvent(long id, String imageName, long time) {
+        this.mId = id;
+        this.mImageName = imageName;
+        this.mTime = time;
+
+        mTimer = new CountDownTimer(time, COUNT_DOWN_INTERVAL) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mTimertv.setText(String.format(Locale.ENGLISH, "%02d:%02d",
+                        millisUntilFinished/(1000*60), millisUntilFinished/1000));
+
+                // Store time left
+                mTimeLeft = millisUntilFinished;
+            }
+
+            @Override
+            public void onFinish() {
+                mTimertv.setText("Finished");
+            }
+        };
+    }
+
+    public void startTimer(TextView tv) {
+        this.mTimertv = tv;
+        mTimer.start();
+    }
+
+    public void cancelTimer() {
+        mTimer.cancel();
+    }
+
+    public long getId() {
+        return mId;
     }
 
     public String getImageName() {
@@ -23,27 +62,24 @@ public class TimerEvent {
     }
 
 
-    public int getHours() {
-        return mHours;
+    public long getTime() {
+        return mTime;
     }
 
-    public void setHours(int hours) {
-        mHours = hours;
+    public void setTime(long time) {
+        mTime = time;
     }
 
-    public int getMinutes() {
-        return mMinutes;
+    public int getImageID() {
+        return mImageID;
     }
 
-    public void setMinutes(int minutes) {
-        mMinutes = minutes;
+    public void setImageID(int imageID) {
+        mImageID = imageID;
     }
 
-    public int getSeconds() {
-        return mSeconds;
-    }
-
-    public void setSeconds(int seconds) {
-        mSeconds = seconds;
+    @Override
+    public String toString() {
+        return "TimerEvent{" + mTime +'}';
     }
 }

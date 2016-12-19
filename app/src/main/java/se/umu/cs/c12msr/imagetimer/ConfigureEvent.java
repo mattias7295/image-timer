@@ -4,15 +4,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+
 public class ConfigureEvent extends AppCompatActivity {
+
+    private static final String TAG = "ConfigureEvent";
 
     public static final String HOURS_SET = "se.umu.cs.c12msr.imagetimer.hours";
     public static final String MINUTES_SET = "se.umu.cs.c12msr.imagetimer.minutes";
@@ -22,7 +30,6 @@ public class ConfigureEvent extends AppCompatActivity {
     private NumberPicker mHoursPicker;
     private NumberPicker mMinutesPicker;
     private NumberPicker mSecondsPicker;
-    private String imagePath;
 
 
     @Override
@@ -33,12 +40,13 @@ public class ConfigureEvent extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_configure_event_tool_bar);
         setSupportActionBar(toolbar);
 
+        //TODO: handle the possible nullpointerexception here.
         // Enable the Up button
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        imagePath = intent.getStringExtra(MainActivity.MESSAGE);
+        String imageFile = intent.getStringExtra(PhotoGridFragment.MESSAGE);
 
         mHoursPicker = (NumberPicker) findViewById(R.id.activity_ce_hours_picker);
         mHoursPicker.setMaxValue(23);
@@ -57,12 +65,12 @@ public class ConfigureEvent extends AppCompatActivity {
 
         mPictureView = (ImageView) findViewById(R.id.activity_configure_event_image);
 
+        File extDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        final String imageFilePath = extDir.getAbsolutePath() + "/" + imageFile;
+        //Picasso.with(this).load(extDir.getAbsolutePath() + "/" + imageFile).into(mPictureView);
         mPictureView.post(new Runnable() {
             @Override
             public void run() {
-                setPic(imagePath);
-            }
-            private void setPic(String mCurrentPhotoPath) {
                 // Get the dimensions of the ImageView
                 int targetW = mPictureView.getWidth();
                 int targetH = mPictureView.getHeight();
@@ -70,7 +78,7 @@ public class ConfigureEvent extends AppCompatActivity {
                 // Get the dimensions of the bitmap
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                 bmOptions.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+                BitmapFactory.decodeFile(imageFilePath, bmOptions);
                 int photoW = bmOptions.outWidth;
                 int photoH = bmOptions.outHeight;
 
@@ -81,11 +89,10 @@ public class ConfigureEvent extends AppCompatActivity {
                 bmOptions.inJustDecodeBounds = false;
                 bmOptions.inSampleSize = scaleFactor;
 
-                Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+                Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath, bmOptions);
                 mPictureView.setImageBitmap(bitmap);
             }
         });
-
     }
 
     public void confirmButtonPressed(View view) {

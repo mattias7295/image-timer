@@ -2,59 +2,58 @@ package se.umu.cs.c12msr.imagetimer;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+public class MainActivity extends AppCompatActivity
+        implements PhotoGridFragment.OnPhotoGridInteractionListener,
+        EventListFragment.OnTimerEventInteractionListener {
 
-public class MainActivity extends AppCompatActivity {
-
-    public static final String MESSAGE = "se.umu.cs.c12msr.imagetimer.message";
 
     private static final String TAG = "MainActivity";
-    static final int REQUEST_TAKE_PHOTO = 1;
-    static final int REQUEST_CONFIGURE_EVENT = 2;
-
-    private GridView mPictureGrid;
-    private String mCurrentPhotoPath;
-    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_tool_bar);
-        setSupportActionBar(toolbar);
 
-        dbHelper = new DatabaseHelper(getApplicationContext());
+        // Check whether the activity is using the layout version
+        // with the fragment_container FrameLayout. If so, we must
+        // add the first fragment
+        if (findViewById(R.id.fragment_container) != null) {
 
-        mPictureGrid = (GridView) findViewById(R.id.activity_main_image_grid);
-        mPictureGrid.setAdapter(new TimerEventAdapter(this, new ArrayList<TimerEvent>()));
-        mPictureGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(MainActivity.this, "" + position,
-                        Toast.LENGTH_SHORT).show();
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState != null) {
+                return;
             }
-        });
+
+            // Create an instance of PhotoGridFragment
+            PhotoGridFragment pgf = PhotoGridFragment.newInstance();
+
+            // In case this activity was started with special instructions
+            // from an Intent, pass the Intent's extras to the fragment as
+            // arguments
+            pgf.setArguments(getIntent().getExtras());
+
+            // Add the fragment to the 'fragment_container' FrameLayout.
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, pgf).commit();
+        }
 
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -64,44 +63,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            Intent intent = new Intent(this, ConfigureEvent.class);
-            intent.putExtra(MESSAGE, mCurrentPhotoPath);
-            startActivityForResult(intent, REQUEST_CONFIGURE_EVENT);
-        } else if (requestCode == REQUEST_CONFIGURE_EVENT) {
-            if (resultCode == RESULT_OK) {
-                TimerEvent te = createTimerEvent(data);
-                ((TimerEventAdapter) mPictureGrid.getAdapter()).addEvent(te);
-                dbHelper.asyncInsert(te);
-            } else if (resultCode == RESULT_CANCELED) {
-
-            }
-        }
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //TODO: need the menu?
         switch (item.getItemId()) {
-            case R.id.action_take_photo:
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                File photoFile = null;
-                try {
-                    photoFile = createImageFile();
-                } catch (IOException ex) {
-                    // Error occurred while creating the File
-                    ex.printStackTrace();
-                }
-                // Continue only if the File was successfully created
-                if (photoFile != null) {
-                    Uri photoURI = FileProvider.getUriForFile(this,
-                            "com.example.android.fileprovider",
-                            photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-                }
-                break;
             case R.id.action_settings:
                 break;
             default:
@@ -111,29 +77,42 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private TimerEvent createTimerEvent(Intent data) {
-        int hours = data.getIntExtra(ConfigureEvent.HOURS_SET, 0);
-        int minutes = data.getIntExtra(ConfigureEvent.MINUTES_SET, 0);
-        int seconds = data.getIntExtra(ConfigureEvent.SECONDS_SET, 0);
-        TimerEvent te = new TimerEvent(mCurrentPhotoPath, hours, minutes, seconds);
-        return te;
+
+    @Override
+    public void onPhotoGridInteraction(TimerEvent event) {
+        // TODO: interaction on the grid.
+
+        // The user selected a photo from the PhotoGridFragment
+
+        EventListFragment eventListFragment = (EventListFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.timer_event_fragment);
+
+        if (eventListFragment != null) {
+            // if the fragment is available, we're in two-pane layout.
+
+            // TODO: start a timer in the EventListFragment
+            eventListFragment.addEvent(event);
+        } else {
+            // One-pane layout.
+
+            // Create fragment and give it an argument for the selected photo.
+            EventListFragment newFragment = EventListFragment.newInstance(event.getId(),
+                    event.getTime(), event.getImageName(), event.getImageID());
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back.
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction.
+            transaction.commit();
+        }
     }
 
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
+    @Override
+    public void onTimerEventInteraction(Uri uri) {
+        // TODO: interaction on a timed event.
     }
 }
