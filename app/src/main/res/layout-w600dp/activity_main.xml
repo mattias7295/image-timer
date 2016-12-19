@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".MainActivity">
+
+        <include
+            layout="@layout/tool_bar"
+            android:id="@+id/tool_bar"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+                <fragment
+                    android:name="se.umu.cs.c12msr.imagetimer.PhotoGridFragment"
+                    android:id="@+id/photo_grid_fragment"
+                    android:layout_weight="2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+
+                <fragment
+                    android:name="se.umu.cs.c12msr.imagetimer.EventListFragment"
+                    android:id="@+id/timer_event_fragment"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+
+</LinearLayout>
