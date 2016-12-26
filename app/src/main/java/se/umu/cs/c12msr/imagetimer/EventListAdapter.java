@@ -1,29 +1,50 @@
 package se.umu.cs.c12msr.imagetimer;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by c12msr on 12-Nov-16.
  */
 public class EventListAdapter extends BaseAdapter {
 
+    private static final String TAG = "EventListAdapter";
+
     private Context mContext;
     private LayoutInflater mInflater;
     private List<TimerEvent> mEvents;
 
-    public EventListAdapter(Context context, List<TimerEvent> events) {
+
+
+    final private List<ViewHolder> lstHolders;
+
+
+    public interface OnEventListListener {
+        void handleRemovePressed(TimerEvent event);
+    }
+
+    private OnEventListListener mCallback;
+
+    public EventListAdapter(Context context, List<TimerEvent> events, OnEventListListener callback) {
         this.mContext = context;
         this.mEvents = events;
+        this.mCallback = callback;
 
+        lstHolders = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);
     }
 
@@ -43,29 +64,101 @@ public class EventListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View frame = convertView;
-        SquareImageView picture;
-        TextView description;
-        TextView countDownText;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        ViewHolder holder = null;
 
-        if (frame == null) {
-            frame = mInflater.inflate(R.layout.event_list_item, parent, false);
-            frame.setTag(R.id.event_list_image, frame.findViewById(R.id.event_list_image));
-            frame.setTag(R.id.event_list_text, frame.findViewById(R.id.event_list_text));
-            frame.setTag(R.id.event_list_timer_text, frame.findViewById(R.id.event_list_timer_text));
-
-        }
         TimerEvent event = getItem(position);
 
-        picture = (SquareImageView) frame.getTag(R.id.event_list_image);
-        description = (TextView) frame.getTag(R.id.event_list_text);
-        countDownText = (TextView) frame.getTag(R.id.event_list_timer_text);
-        //TODO: should show description of the image.
-        description.setText(event.getImageName());
-        event.startTimer(countDownText);
+        if (convertView == null) {
+            holder = new ViewHolder();
+            convertView = mInflater.inflate(R.layout.event_list_item, parent, false);
+            holder.name = (TextView) convertView.findViewById(R.id.event_list_text);
+            holder.picture = (SquareImageView) convertView.findViewById(R.id.event_list_image);
+            holder.countDownText = (TextView) convertView.findViewById(R.id.event_list_timer_text);
+            holder.removeButton = (Button) convertView.findViewById(R.id.event_list_remove_button);
 
-        Picasso.with(mContext).load(event.getImageID()).into(picture);
-        return frame;
+
+            convertView.setTag(holder);
+            synchronized (lstHolders) {
+                lstHolders.add(holder);
+            }
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+
+        }
+        holder.removeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimerEvent event = getItem(position);
+                mEvents.remove(event);
+                mCallback.handleRemovePressed(event);
+                notifyDataSetChanged();
+            }
+        });
+
+        /*
+        this didn't work...
+        if (holder.timerEvent != null &&
+                holder.timerEvent.getTimerId() != event.getTimerId()) {
+            // Remove old holder object from the map
+            // and put new holder with different id
+            // when replacing timerEvents.
+            synchronized (lstHolders) {
+                Log.i(TAG, "Replace id on holder from: " + holder.timerEvent.getTimerId()
+                        + " to: " + event.getTimerId());
+                lstHolders.remove(holder.timerEvent.getTimerId());
+                ViewHolder tmpHolder = lstHolders.put(event.getTimerId(), holder);
+                if (tmpHolder != null) {
+                    Log.i(TAG, "saving holder on id 0");
+                    lstHolders.put(0L, tmpHolder);
+                }
+            }
+        }
+        */
+
+        holder.setData(event);
+
+        return convertView;
+    }
+
+    public void updateTimers(long timeLeft[]) {
+        //TODO: try to find better solution for this.
+        for (int i = 0; i < timeLeft.length; i+=2) {
+            for (int j = 0; j < lstHolders.size(); j++) {
+                ViewHolder holder = lstHolders.get(j);
+                if (holder.timerEvent.getTimerId() == timeLeft[i]) {
+                    holder.timerEvent.setTimer(timeLeft[i+1]);
+                    holder.updateTimeRemaining();
+                    break;
+                }
+            }
+        }
+    }
+
+    private class ViewHolder {
+        TextView name;
+        TextView countDownText;
+        SquareImageView picture;
+        Button removeButton;
+        TimerEvent timerEvent;
+
+        public void setData(TimerEvent event) {
+            timerEvent = event;
+            name.setText(timerEvent.getImageName());
+
+            updateTimeRemaining();
+            Picasso.with(mContext).load(timerEvent.getImageID()).into(picture);
+        }
+
+        public void updateTimeRemaining() {
+            long timeInSeconds = timerEvent.getTimeLeft()/1000;
+            if (timeInSeconds >= 0) {
+                countDownText.setText(String.format(Locale.ENGLISH, "%02d:%02d:%02d",
+                        timeInSeconds/3600, (timeInSeconds%3600) / 60, timeInSeconds%60));
+            } else {
+                countDownText.setText("Expired!!");
+            }
+        }
+
     }
 }

@@ -1,7 +1,11 @@
 <resources>
-    <string name="app_name">Picture Timer</string>
+    <string name="app_name">Image Timer</string>
     <string name="configure_activity_title">Set Time</string>
     <string name="colon">:</string>
-
     <string name="service_desc">Runs a countdown timer and notifies when finished</string>
+    <string name="timer_service_started">Timer service started</string>
+    <string name="timer_service_connected">Connected to the service</string>
+    <string name="timer_service_disconnected">Disconnected from the service</string>
+    <string name="timer_expired">A timer has expired!</string>
+    <string name="notification_title">Image Timer notification</string>
 </resources>

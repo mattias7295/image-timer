@@ -1,7 +1,11 @@
 package se.umu.cs.c12msr.imagetimer;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements PhotoGridFragment.OnPhotoGridInteractionListener,
@@ -17,10 +22,16 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // use custom toolbar.
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
 
         // Check whether the activity is using the layout version
         // with the fragment_container FrameLayout. If so, we must
@@ -45,10 +56,6 @@ public class MainActivity extends AppCompatActivity
             // Add the fragment to the 'fragment_container' FrameLayout.
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, pgf).commit();
         }
-
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -66,7 +73,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //TODO: need the menu?
+        //TODO: fill menu later if needed.
         switch (item.getItemId()) {
             case R.id.action_settings:
                 break;
@@ -80,8 +87,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPhotoGridInteraction(TimerEvent event) {
-        // TODO: interaction on the grid.
-
         // The user selected a photo from the PhotoGridFragment
 
         EventListFragment eventListFragment = (EventListFragment) getSupportFragmentManager()
@@ -90,7 +95,6 @@ public class MainActivity extends AppCompatActivity
         if (eventListFragment != null) {
             // if the fragment is available, we're in two-pane layout.
 
-            // TODO: start a timer in the EventListFragment
             eventListFragment.addEvent(event);
         } else {
             // One-pane layout.
@@ -113,6 +117,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onTimerEventInteraction(Uri uri) {
-        // TODO: interaction on a timed event.
+        // not used.
     }
 }

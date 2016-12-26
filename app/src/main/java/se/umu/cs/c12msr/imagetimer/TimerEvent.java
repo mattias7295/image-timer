@@ -1,6 +1,7 @@
 package se.umu.cs.c12msr.imagetimer;
 
 import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -8,16 +9,14 @@ import java.util.Locale;
 /**
  * Created by c12msr on 17-Aug-16.
  */
-public class TimerEvent {
-
-    private static final long COUNT_DOWN_INTERVAL = 1000; // 1 sec interval
-
+public class TimerEvent implements Cloneable {
     private String mImageName;
     private long mTime;
     private long mId;
-    private CountDownTimer mTimer;
-    private TextView mTimertv;
+
+
     private long mTimeLeft;
+    private long mTimerId;
 
     //TODO: temp image
     private int mImageID;
@@ -26,31 +25,6 @@ public class TimerEvent {
         this.mId = id;
         this.mImageName = imageName;
         this.mTime = time;
-
-        mTimer = new CountDownTimer(time, COUNT_DOWN_INTERVAL) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                mTimertv.setText(String.format(Locale.ENGLISH, "%02d:%02d",
-                        millisUntilFinished/(1000*60), millisUntilFinished/1000));
-
-                // Store time left
-                mTimeLeft = millisUntilFinished;
-            }
-
-            @Override
-            public void onFinish() {
-                mTimertv.setText("Finished");
-            }
-        };
-    }
-
-    public void startTimer(TextView tv) {
-        this.mTimertv = tv;
-        mTimer.start();
-    }
-
-    public void cancelTimer() {
-        mTimer.cancel();
     }
 
     public long getId() {
@@ -76,6 +50,33 @@ public class TimerEvent {
 
     public void setImageID(int imageID) {
         mImageID = imageID;
+    }
+
+    public long getTimeLeft() {
+        return mTimeLeft;
+    }
+
+    public void setTimer(long time) {
+        mTimeLeft = time;
+    }
+
+    public long getTimerId() {
+        return mTimerId;
+    }
+
+    public void setTimerId(long mTimerId) {
+        this.mTimerId = mTimerId;
+    }
+
+    /**
+     * purpose is to be able to set the time when the timer is started
+     * without changing the time for the next run.
+     * @return
+     * @throws CloneNotSupportedException
+     */
+    @Override
+    public TimerEvent clone() throws CloneNotSupportedException {
+        return (TimerEvent) super.clone();
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -26,14 +27,6 @@ import java.util.Date;
 import java.util.List;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link PhotoGridFragment.OnPhotoGridInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PhotoGridFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PhotoGridFragment extends Fragment {
 
     public static final String MESSAGE = "se.umu.cs.c12msr.imagetimer.message";
@@ -161,7 +154,6 @@ public class PhotoGridFragment extends Fragment {
     }
 
     private void takePhoto() {
-        // TODO: create a class to control the camera.
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File photoFile = null;
         try {
@@ -204,7 +196,6 @@ public class PhotoGridFragment extends Fragment {
 
 
     public interface OnPhotoGridInteractionListener {
-        // TODO: Update argument type and name
         void onPhotoGridInteraction(TimerEvent event);
     }
 
