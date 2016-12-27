@@ -24,6 +24,7 @@ public class TimerService extends Service {
     public static final String TIME_LEFT = "countdown";
 
 
+
     private static final String TAG = "TimerService";
 
     private NotificationManager mNM;
@@ -106,10 +107,14 @@ public class TimerService extends Service {
                         broadcastIntent.putExtra(TIME_LEFT, timeLeft);
                         sendBroadcast(broadcastIntent);
 
-                    //TODO: notify user that a timer has expired.
+                    // Remove expired timers
                     if (removeList.size() != 0) {
-                        showNotification();
                         for (Long key : removeList) {
+
+                            if (!MainActivity.isAppForeground) {
+                                // show notification if app is in background
+                                showNotification(key);
+                            }
                             mTimerEvents.remove(key);
                         }
                     }
@@ -123,14 +128,15 @@ public class TimerService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    private void showNotification() {
+    private void showNotification(long id) {
         CharSequence title = getText(R.string.notification_title);
         CharSequence text = getText(R.string.timer_expired);
 
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
         Intent resultIntent = new Intent(this, MainActivity.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        resultIntent.putExtra(MainActivity.TIMER_ID_EXPIRED, id);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(

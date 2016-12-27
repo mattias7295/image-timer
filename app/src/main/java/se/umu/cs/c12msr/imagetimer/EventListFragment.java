@@ -3,15 +3,19 @@ package se.umu.cs.c12msr.imagetimer;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +33,9 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
 
     private static final String TAG = "EventListFragment";
 
+    private static final String RUNNING_TIMER_EVENTS = "running_timer_events";
+    private static final String CURRENT_COUNTER_VALUE = "current_counter_value";
+
     private static final String ARG_ID      = "arg_id";
     private static final String ARG_TIME    = "arg_time";
     private static final String ARG_IMAGE   = "arg_image";
@@ -36,7 +43,7 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
 
     private OnTimerEventInteractionListener mCallback;
     private ListView mListView;
-    private List<TimerEvent> mEvents;
+    private ArrayList<TimerEvent> mEvents;
 
     private TimerService mBoundService;
     private boolean mIsBound;
@@ -101,7 +108,7 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mEvents = new ArrayList<>();
+
 
         Bundle args = getArguments();
         if (args != null) {
@@ -116,7 +123,12 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         }
         doBindService();
 
-        mCounter = 1L;
+        if (savedInstanceState != null) {
+            mCounter = savedInstanceState.getLong(CURRENT_COUNTER_VALUE, 1L);
+        } else {
+            mCounter = 1L;
+        }
+
     }
 
     @Override
@@ -125,14 +137,13 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_timer_event, container, false);
 
+        if (savedInstanceState != null) {
+            mEvents = savedInstanceState.getParcelableArrayList(RUNNING_TIMER_EVENTS);
+        } else {
+            mEvents = new ArrayList<>();
+        }
         mListView = (ListView) view.findViewById(R.id.fragment_timerevent_lv);
         mListView.setAdapter(new EventListAdapter(getActivity(), mEvents, this));
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
 
         return view;
     }
@@ -148,6 +159,16 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
                     + " must implement OnTimerEventInteractionListener");
         }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "Saving state");
+
+        outState.putParcelableArrayList(RUNNING_TIMER_EVENTS, mEvents);
+        outState.putLong(CURRENT_COUNTER_VALUE, mCounter);
+    }
+
 
     @Override
     public void onResume() {
@@ -187,6 +208,17 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         doUnbindService();
     }
 
+    public void restartedFromNotification(long timerEventId) {
+        for (TimerEvent event : mEvents) {
+            if (event.getTimerId() == timerEventId) {
+                // set expired
+                event.setTimer(-1);
+                break;
+            }
+        }
+        ((EventListAdapter)mListView.getAdapter()).notifyDataSetChanged();
+    }
+
     /**
      *  Add a event to the list of running events.
      * @param event the event to add to the list
@@ -211,6 +243,28 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
     public void handleRemovePressed(TimerEvent event) {
         // Remove event from service
         mBoundService.removeTimerEvent(event.getTimerId());
+    }
+
+    @Override
+    public void handleTimerExpiration(TimerEvent event) {
+        // Show alertdialog with sound
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
+        final Ringtone r = RingtoneManager.getRingtone(getActivity(), soundUri);
+        r.play();
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(event.getImageName() + " has expired!")
+                .setMessage("Press ok to remove this timer")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        r.stop();
+                    }
+                })
+                .show();
     }
 
 

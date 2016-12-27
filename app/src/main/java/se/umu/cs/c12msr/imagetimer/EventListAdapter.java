@@ -1,7 +1,6 @@
 package se.umu.cs.c12msr.imagetimer;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +11,8 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created by c12msr on 12-Nov-16.
@@ -35,6 +32,7 @@ public class EventListAdapter extends BaseAdapter {
 
     public interface OnEventListListener {
         void handleRemovePressed(TimerEvent event);
+        void handleTimerExpiration(TimerEvent event);
     }
 
     private OnEventListListener mCallback;
@@ -157,6 +155,7 @@ public class EventListAdapter extends BaseAdapter {
                         timeInSeconds/3600, (timeInSeconds%3600) / 60, timeInSeconds%60));
             } else {
                 countDownText.setText("Expired!!");
+                mCallback.handleTimerExpiration(timerEvent);
             }
         }
 
