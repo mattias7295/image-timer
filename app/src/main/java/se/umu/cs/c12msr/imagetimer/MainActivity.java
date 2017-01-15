@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+            Log.i(TAG, "onTrimMemory: screen not showing");
             //Screen is not showing
             isAppForeground = false;
         }
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.timer_event_fragment);
 
         if (eventListFragment != null) {
+            // in two-pane layout
             eventListFragment.restartedFromNotification(mTimerEventExpired);
         }
     }
@@ -142,7 +144,6 @@ public class MainActivity extends AppCompatActivity
 
         if (eventListFragment != null) {
             // if the fragment is available, we're in two-pane layout.
-
             eventListFragment.addEvent(event);
         } else {
             // One-pane layout.

@@ -31,7 +31,8 @@
             android:layout_weight="2"
             android:gravity="center_horizontal"
             android:paddingTop="20dp"
-            android:paddingBottom="20dp">
+            android:paddingBottom="20dp"
+            >
 
             <NumberPicker
                 android:layout_width="match_parent"
@@ -45,10 +46,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/colon"
+                android:text="@string/hour"
                 android:id="@+id/textView"
                 android:layout_gravity="center_vertical"
-                android:textSize="@dimen/abc_text_size_display_1_material"/>
+                />
 
             <NumberPicker
                 android:layout_width="match_parent"
@@ -63,19 +64,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/colon"
+                android:text="@string/minutes"
                 android:id="@+id/textView2"
                 android:layout_gravity="center_vertical"
-                android:textSize="@dimen/abc_text_size_display_1_material"/>
-
-            <NumberPicker
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/activity_ce_seconds_picker"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="2dp"
-                android:layout_weight="1"
-                android:descendantFocusability="blocksDescendants"/>
+                />
 
         </LinearLayout>
 

@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class PhotoGridFragment extends Fragment {
@@ -64,11 +65,11 @@ public class PhotoGridFragment extends Fragment {
         }
 
         // TODO: Use these on real demo
-        //dbHelper = new DatabaseHelper(getActivity());
-        //List<TimerEvent> eventList = dbHelper.fetchAllEvents();
+        dbHelper = new DatabaseHelper(getActivity());
+        mTimerEvents  = dbHelper.fetchAllEvents();
 
         // FOR TESTING
-        mTimerEvents = createTempEvents();
+        //mTimerEvents = createTempEvents();
     }
 
     @Override
@@ -93,7 +94,6 @@ public class PhotoGridFragment extends Fragment {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: implement photo capture functionality.
                     takePhoto();
                 }
             });
@@ -148,7 +148,7 @@ public class PhotoGridFragment extends Fragment {
                 ((PhotoGridAdapter) mPictureGrid.getAdapter()).addEvent(te);
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                // TODO: delete temp file
+                removeFile(mCurrentPhoto);
             }
         }
     }
@@ -174,7 +174,7 @@ public class PhotoGridFragment extends Fragment {
 
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
 
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -183,7 +183,6 @@ public class PhotoGridFragment extends Fragment {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhoto = image.getName();
         Log.i(TAG, image.getAbsolutePath());
@@ -191,7 +190,14 @@ public class PhotoGridFragment extends Fragment {
     }
 
     private void removeFile(String name) {
-        // TODO: implement this feature.
+        File photoFile = new File(name);
+        boolean deleted = photoFile.delete();
+
+        if (deleted) {
+            Log.i(TAG, "removeFile: file deleted");
+        } else {
+            Log.i(TAG, "removeFile: could'nt delete file");
+        }
     }
 
 

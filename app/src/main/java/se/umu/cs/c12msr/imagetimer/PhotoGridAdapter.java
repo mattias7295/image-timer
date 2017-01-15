@@ -68,8 +68,8 @@ public class PhotoGridAdapter extends BaseAdapter {
         name.setText(event.getImageName());
 
         //TODO: use imageFile instead in production.
-        //File imageFile = new File(extDir + "/" + getItem(position).getImageName());
-        Picasso.with(mContext).load(event.getImageID()).resize(80,80).centerCrop().into(picture);
+        File imageFile = new File(extDir + "/" + getItem(position).getImageName());
+        Picasso.with(mContext).load(imageFile).resize(80,80).centerCrop().into(picture);
         return frame;
     }
 

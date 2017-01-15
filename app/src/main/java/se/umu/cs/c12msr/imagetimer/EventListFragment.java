@@ -12,6 +12,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -83,9 +84,15 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
     private BroadcastReceiver br = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getExtras() != null) {
-                long timeLeft[] = intent.getLongArrayExtra(TimerService.TIME_LEFT);
-                ((EventListAdapter)mListView.getAdapter()).updateTimers(timeLeft);
+            if (intent.getAction().equals(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)) {
+                Log.i(TAG, "onReceive: Device idle mode changed");
+            } else if (intent.getAction().equals(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)) {
+                Log.i(TAG, "onReceive: Power save mode changed");
+            } else if (intent.getAction().equals(TimerService.COUNTDOWN_BR)) {
+                if (intent.getExtras() != null) {
+                    long timeLeft[] = intent.getLongArrayExtra(TimerService.TIME_LEFT);
+                    ((EventListAdapter)mListView.getAdapter()).updateTimers(timeLeft);
+                }
             }
         }
     };
@@ -124,8 +131,15 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         doBindService();
 
         if (savedInstanceState != null) {
+            mEvents = savedInstanceState.getParcelableArrayList(RUNNING_TIMER_EVENTS);
+            for (TimerEvent event : mEvents) {
+                if (mBoundService.hasTimerEventExpired(event.getTimerId())) {
+                    event.setTimer(-1L);
+                }
+            }
             mCounter = savedInstanceState.getLong(CURRENT_COUNTER_VALUE, 1L);
         } else {
+            mEvents = new ArrayList<>();
             mCounter = 1L;
         }
 
@@ -137,11 +151,6 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_timer_event, container, false);
 
-        if (savedInstanceState != null) {
-            mEvents = savedInstanceState.getParcelableArrayList(RUNNING_TIMER_EVENTS);
-        } else {
-            mEvents = new ArrayList<>();
-        }
         mListView = (ListView) view.findViewById(R.id.fragment_timerevent_lv);
         mListView.setAdapter(new EventListAdapter(getActivity(), mEvents, this));
 
@@ -174,7 +183,11 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
     public void onResume() {
         super.onResume();
         Log.i(TAG, "Register broadcast receiver");
-        getActivity().registerReceiver(br, new IntentFilter(TimerService.COUNTDOWN_BR));
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
+        filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
+        filter.addAction(TimerService.COUNTDOWN_BR);
+        getActivity().registerReceiver(br, filter);
     }
 
     @Override
@@ -212,7 +225,7 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         for (TimerEvent event : mEvents) {
             if (event.getTimerId() == timerEventId) {
                 // set expired
-                event.setTimer(-1);
+                event.setTimer(-1L);
                 break;
             }
         }
@@ -235,7 +248,7 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
             mBoundService.addTimerEvent(clone.getTimerId(), clone.getTimeLeft());
             ((EventListAdapter) mListView.getAdapter()).notifyDataSetChanged();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            // Can't happen
         }
     }
 

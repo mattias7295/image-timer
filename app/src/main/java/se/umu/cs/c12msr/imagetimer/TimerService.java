@@ -9,7 +9,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -32,8 +32,12 @@ public class TimerService extends Service {
     private int NOTIFICATION = 1;
 
     private Hashtable<Long, Long> mTimerEvents;
-    private Intent broadcastIntent = new Intent(COUNTDOWN_BR);
-    private boolean canStop;
+    private Intent mBroadcastIntent = new Intent(COUNTDOWN_BR);
+    private boolean mIsRunning;
+    private PowerManager.WakeLock mWakeLock;
+
+    private final Object mLock = new Object();
+    private PowerManager mPowerManager;
 
 
     public class LocalBinder extends Binder {
@@ -48,23 +52,26 @@ public class TimerService extends Service {
     @Override
     public void onCreate() {
         mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mIsRunning = false;
+
+        mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "MyWakelockTag");
 
         mTimerEvents = new Hashtable<>();
-        canStop = true;
-        startUpdateTimer();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         mNM.cancel(NOTIFICATION);
-
         Toast.makeText(this, R.string.timer_service_started, Toast.LENGTH_SHORT).show();
+        mWakeLock.release();
     }
 
     @Override
@@ -73,14 +80,21 @@ public class TimerService extends Service {
     }
 
     public void addTimerEvent(long key, long time) {
-        mTimerEvents.put(key, time);
-        /*if (canStop) {
-            startUpdateTimer();
-        }*/
+        synchronized (mLock) {
+            mTimerEvents.put(key, time);
+            if (!mIsRunning) {
+                mWakeLock.acquire();
+                startUpdateTimer();
+            }
+        }
     }
 
     public void removeTimerEvent(long key) {
         mTimerEvents.remove(key);
+    }
+
+    public boolean hasTimerEventExpired(long key) {
+        return !mTimerEvents.containsKey(key);
     }
 
 
@@ -89,38 +103,43 @@ public class TimerService extends Service {
         tmr.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (mTimerEvents.size() != 0) {
-                    ArrayList<Long> removeList = new ArrayList<Long>();
-                    long timeLeft[] = new long[mTimerEvents.size()*2];
-                    int i = 0;
-                    //canStop = true;
-                    for (Long key : mTimerEvents.keySet()) {
-                        timeLeft[i] = key;
-                        long newValue = mTimerEvents.get(key) - 1000;
-                        timeLeft[i+1] = newValue;
-                        mTimerEvents.put(key, newValue);
-                        i+=2;
-                        if (newValue < 0) {
-                            removeList.add(key);
-                        }
-                    }
-                        broadcastIntent.putExtra(TIME_LEFT, timeLeft);
-                        sendBroadcast(broadcastIntent);
+                mIsRunning = true;
+                ArrayList<Long> removeList = new ArrayList<>();
+                long timeLeft[] = new long[mTimerEvents.size()*2];
 
-                    // Remove expired timers
-                    if (removeList.size() != 0) {
-                        for (Long key : removeList) {
+                int i = 0;
+                for (Long key : mTimerEvents.keySet()) {
+                    long newValue = mTimerEvents.get(key) - 1000;
 
-                            if (!MainActivity.isAppForeground) {
-                                // show notification if app is in background
-                                showNotification(key);
-                            }
-                            mTimerEvents.remove(key);
-                        }
+                    timeLeft[i] = key;
+                    timeLeft[i+1] = newValue;
+                    mTimerEvents.put(key, newValue);
+                    i+=2;
+
+                    if (newValue < 0) {
+                        removeList.add(key);
                     }
-                    /*if (canStop) {
+                }
+                mBroadcastIntent.putExtra(TIME_LEFT, timeLeft);
+                sendBroadcast(mBroadcastIntent);
+
+                // Remove expired timers
+                if (!removeList.isEmpty()) {
+                    for (Long key : removeList) {
+
+                        if (!MainActivity.isAppForeground || !mPowerManager.isInteractive()) {
+                            // show notification if app is in background or device not interactive
+                            showNotification(key);
+                        }
+                        mTimerEvents.remove(key);
+                    }
+                }
+                synchronized (mLock) {
+                    if (mTimerEvents.isEmpty()) {
+                        mIsRunning = false;
                         cancel();
-                    }*/
+                        mWakeLock.release();
+                    }
                 }
             }
         }, 1000, 1000);

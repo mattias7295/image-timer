@@ -94,26 +94,6 @@ public class EventListAdapter extends BaseAdapter {
             }
         });
 
-        /*
-        this didn't work...
-        if (holder.timerEvent != null &&
-                holder.timerEvent.getTimerId() != event.getTimerId()) {
-            // Remove old holder object from the map
-            // and put new holder with different id
-            // when replacing timerEvents.
-            synchronized (lstHolders) {
-                Log.i(TAG, "Replace id on holder from: " + holder.timerEvent.getTimerId()
-                        + " to: " + event.getTimerId());
-                lstHolders.remove(holder.timerEvent.getTimerId());
-                ViewHolder tmpHolder = lstHolders.put(event.getTimerId(), holder);
-                if (tmpHolder != null) {
-                    Log.i(TAG, "saving holder on id 0");
-                    lstHolders.put(0L, tmpHolder);
-                }
-            }
-        }
-        */
-
         holder.setData(event);
 
         return convertView;
