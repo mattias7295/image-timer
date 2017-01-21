@@ -1,18 +1,16 @@
 package se.umu.cs.c12msr.imagetimer;
 
-import android.os.CountDownTimer;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.SystemClock;
-import android.widget.TextView;
-
-import java.util.Locale;
 
 /**
  * Created by c12msr on 17-Aug-16.
  */
 public class TimerEvent implements Cloneable, Parcelable {
-    private String mImageName;
+
+
+    private String mImagePath;
+    private String mName;
     private long mTime;
     private long mId;
 
@@ -23,18 +21,21 @@ public class TimerEvent implements Cloneable, Parcelable {
     //TODO: temp image
     private int mImageID;
 
-    public TimerEvent(long id, String imageName, long time) {
+    public TimerEvent(long id, long time, String imagePath, String name) {
         this.mId = id;
-        this.mImageName = imageName;
         this.mTime = time;
+        this.mImagePath = imagePath;
+        this.mName = name;
     }
+
+
 
     public long getId() {
         return mId;
     }
 
-    public String getImageName() {
-        return mImageName;
+    public String getImagePath() {
+        return mImagePath;
     }
 
 
@@ -52,6 +53,14 @@ public class TimerEvent implements Cloneable, Parcelable {
 
     public void setImageID(int imageID) {
         mImageID = imageID;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     public long getTimeLeft() {
@@ -86,6 +95,7 @@ public class TimerEvent implements Cloneable, Parcelable {
         return "TimerEvent{" + mTime +'}';
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -93,7 +103,8 @@ public class TimerEvent implements Cloneable, Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.mImageName);
+        dest.writeString(this.mImagePath);
+        dest.writeString(this.mName);
         dest.writeLong(this.mTime);
         dest.writeLong(this.mId);
         dest.writeLong(this.mTimeLeft);
@@ -102,7 +113,8 @@ public class TimerEvent implements Cloneable, Parcelable {
     }
 
     protected TimerEvent(Parcel in) {
-        this.mImageName = in.readString();
+        this.mImagePath = in.readString();
+        this.mName = in.readString();
         this.mTime = in.readLong();
         this.mId = in.readLong();
         this.mTimeLeft = in.readLong();

@@ -2,7 +2,6 @@ package se.umu.cs.c12msr.imagetimer;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +23,8 @@ public class PhotoGridAdapter extends BaseAdapter {
     private final List<TimerEvent> mTimerEvents;
     private final LayoutInflater mInflater;
     private Context mContext;
-    private File extDir;
 
     public PhotoGridAdapter(Context context, List<TimerEvent> teList) {
-        extDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         this.mTimerEvents = teList;
         mInflater = LayoutInflater.from(context);
         mContext = context;
@@ -64,12 +61,9 @@ public class PhotoGridAdapter extends BaseAdapter {
         TimerEvent event = getItem(position);
         picture = (SquareImageView) frame.getTag(R.id.grid_item_picture);
         name = (TextView) frame.getTag(R.id.grid_item_text);
-        //TODO: "name" should describe the event not the path of the file.
-        name.setText(event.getImageName());
+        name.setText(event.getName());
 
-        //TODO: use imageFile instead in production.
-        File imageFile = new File(extDir + "/" + getItem(position).getImageName());
-        Picasso.with(mContext).load(imageFile).resize(80,80).centerCrop().into(picture);
+        Picasso.with(mContext).load(event.getImagePath()).resize(80,80).centerCrop().into(picture);
         return frame;
     }
 

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 
@@ -24,12 +25,12 @@ public class ConfigureEvent extends AppCompatActivity {
 
     public static final String HOURS_SET = "se.umu.cs.c12msr.imagetimer.hours";
     public static final String MINUTES_SET = "se.umu.cs.c12msr.imagetimer.minutes";
-    public static final String SECONDS_SET = "se.umu.cs.c12msr.imagetimer.seconds";
+    public static final String NAME_SET = "se.umu.cs.c12msr.imagetimer.name";
 
     private ImageView mPictureView;
     private NumberPicker mHoursPicker;
     private NumberPicker mMinutesPicker;
-    private NumberPicker mSecondsPicker;
+    private EditText mNameTV;
 
 
     @Override
@@ -40,34 +41,42 @@ public class ConfigureEvent extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.activity_configure_event_tool_bar);
         setSupportActionBar(toolbar);
 
-        //TODO: handle the possible nullpointerexception here.
         // Enable the Up button
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
 
         Intent intent = getIntent();
         String imageFile = intent.getStringExtra(PhotoGridFragment.MESSAGE);
 
         mHoursPicker = (NumberPicker) findViewById(R.id.activity_ce_hours_picker);
-        mHoursPicker.setMaxValue(23);
-        mHoursPicker.setMinValue(0);
-        mHoursPicker.setWrapSelectorWheel(false);
+        if (mHoursPicker != null) {
+            mHoursPicker.setMaxValue(23);
+            mHoursPicker.setMinValue(0);
+            mHoursPicker.setWrapSelectorWheel(false);
+        }
 
         mMinutesPicker = (NumberPicker) findViewById(R.id.activity_ce_minutes_picker);
-        mMinutesPicker.setMaxValue(59);
-        mMinutesPicker.setMinValue(0);
-        mMinutesPicker.setWrapSelectorWheel(false);
+        if (mMinutesPicker != null) {
+            mMinutesPicker.setMaxValue(59);
+            mMinutesPicker.setMinValue(0);
+            mMinutesPicker.setWrapSelectorWheel(false);
+        }
 
-        mSecondsPicker = (NumberPicker) findViewById(R.id.activity_ce_seconds_picker);
-        mSecondsPicker.setMaxValue(59);
-        mSecondsPicker.setMinValue(0);
-        mSecondsPicker.setWrapSelectorWheel(false);
+        mNameTV = (EditText) findViewById(R.id.name_tv);
 
         mPictureView = (ImageView) findViewById(R.id.activity_configure_event_image);
 
-        File extDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        final String imageFilePath = extDir.getAbsolutePath() + "/" + imageFile;
-        //Picasso.with(this).load(extDir.getAbsolutePath() + "/" + imageFile).into(mPictureView);
+        if (StorageHelper.isExternalStorageReadable()) {
+            File extDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            final String imageFilePath;
+            if (extDir != null) {
+                imageFilePath = extDir.getAbsolutePath() + "/" + imageFile;
+                Picasso.with(this).load(imageFilePath).into(mPictureView);
+            }
+        }
+        /*
         mPictureView.post(new Runnable() {
             @Override
             public void run() {
@@ -93,17 +102,18 @@ public class ConfigureEvent extends AppCompatActivity {
                 mPictureView.setImageBitmap(bitmap);
             }
         });
+        */
     }
 
     public void confirmButtonPressed(View view) {
         int hours = mHoursPicker.getValue();
         int minutes = mMinutesPicker.getValue();
-        int seconds = mSecondsPicker.getValue();
+        String name = mNameTV.getText().toString();
 
         Intent intent = new Intent();
         intent.putExtra(HOURS_SET, hours);
         intent.putExtra(MINUTES_SET, minutes);
-        intent.putExtra(SECONDS_SET, seconds);
+        intent.putExtra(NAME_SET, name);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

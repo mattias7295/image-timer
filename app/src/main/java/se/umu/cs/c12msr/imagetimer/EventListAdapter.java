@@ -122,10 +122,10 @@ public class EventListAdapter extends BaseAdapter {
 
         public void setData(TimerEvent event) {
             timerEvent = event;
-            name.setText(timerEvent.getImageName());
+            name.setText(timerEvent.getImagePath());
 
             updateTimeRemaining();
-            Picasso.with(mContext).load(timerEvent.getImageID()).into(picture);
+            Picasso.with(mContext).load(timerEvent.getImagePath()).into(picture);
         }
 
         public void updateTimeRemaining() {

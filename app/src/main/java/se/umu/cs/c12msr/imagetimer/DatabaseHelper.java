@@ -35,18 +35,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             public void run() {
                 SQLiteDatabase db = getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_IMAGE, te.getImageName());
+                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_IMAGE, te.getImagePath());
                 values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_TIME, te.getTime());
+                values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_EVENT_NAME, te.getName());
                 db.insert(DatabaseContract.TimerEventEntry.TABLE_NAME, null, values);
             }
         }).start();
     }
 
-    public long blockingInsert(String imageName, long time) {
+    public long blockingInsert(String imageName, long time, String name) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_IMAGE, imageName);
         values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_TIME, time);
+        values.put(DatabaseContract.TimerEventEntry.COLUMN_NAME_EVENT_NAME, name);
         return db.insert(DatabaseContract.TimerEventEntry.TABLE_NAME, null, values);
     }
 
@@ -55,6 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 DatabaseContract.TimerEventEntry._ID,
                 DatabaseContract.TimerEventEntry.COLUMN_NAME_IMAGE,
                 DatabaseContract.TimerEventEntry.COLUMN_NAME_TIME,
+                DatabaseContract.TimerEventEntry.COLUMN_NAME_EVENT_NAME
         };
 
         SQLiteDatabase db = getReadableDatabase();
@@ -64,9 +67,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             while (c.moveToNext()) {
                 long id = c.getLong(c.getColumnIndex(DatabaseContract.TimerEventEntry._ID));
-                String imageName = c.getString(c.getColumnIndex(DatabaseContract.TimerEventEntry.COLUMN_NAME_IMAGE));
+                String imagePath = c.getString(c.getColumnIndex(DatabaseContract.TimerEventEntry.COLUMN_NAME_IMAGE));
                 long time = c.getLong(c.getColumnIndex(DatabaseContract.TimerEventEntry.COLUMN_NAME_TIME));
-                eventList.add(new TimerEvent(id, imageName, time));
+                String name = c.getString(c.getColumnIndex(DatabaseContract.TimerEventEntry.COLUMN_NAME_EVENT_NAME));
+                eventList.add(new TimerEvent(id, time, imagePath, name));
             }
         } finally {
             c.close();

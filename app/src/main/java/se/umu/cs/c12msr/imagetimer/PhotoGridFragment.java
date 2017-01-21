@@ -135,16 +135,15 @@ public class PhotoGridFragment extends Fragment {
                 /* get the time set */
                 int hours = data.getIntExtra(ConfigureEvent.HOURS_SET, 0);
                 int minutes = data.getIntExtra(ConfigureEvent.MINUTES_SET, 0);
-                int seconds = data.getIntExtra(ConfigureEvent.SECONDS_SET, 0);
+                String name = data.getStringExtra(ConfigureEvent.NAME_SET);
 
                 /* compute time in ms */
                 long time = hours * 60 * 60 * 1000 +
-                            minutes * 60 * 1000 +
-                            seconds * 1000;
+                            minutes * 60 * 1000;
 
                 /* insert value in db and create TimerEvent */
-                long id = dbHelper.blockingInsert(mCurrentPhoto, time);
-                TimerEvent te = new TimerEvent(id, mCurrentPhoto, time);
+                long id = dbHelper.blockingInsert(mCurrentPhoto, time, name);
+                TimerEvent te = new TimerEvent(id, time, mCurrentPhoto, name);
                 ((PhotoGridAdapter) mPictureGrid.getAdapter()).addEvent(te);
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
@@ -177,6 +176,7 @@ public class PhotoGridFragment extends Fragment {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
 
+        // TODO: create file in internal storage if external does not exist.
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
@@ -184,7 +184,7 @@ public class PhotoGridFragment extends Fragment {
                 storageDir      /* directory */
         );
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhoto = image.getName();
+        mCurrentPhoto = image.getAbsolutePath();
         Log.i(TAG, image.getAbsolutePath());
         return image;
     }
@@ -209,7 +209,7 @@ public class PhotoGridFragment extends Fragment {
     private List<TimerEvent> createTempEvents() {
         ArrayList<TimerEvent> tmp = new ArrayList<>();
         for (int i = 0; i < mTestImageIds.length; i++) {
-            TimerEvent event = new TimerEvent(i, "test" + i, (i+1)*1000*10);
+            TimerEvent event = new TimerEvent(i, (i+1)*1000*10, "test" + i, "name");
             event.setImageID(mTestImageIds[i]);
             tmp.add(event);
         }

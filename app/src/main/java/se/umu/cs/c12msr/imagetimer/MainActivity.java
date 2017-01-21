@@ -1,12 +1,8 @@
 package se.umu.cs.c12msr.imagetimer;
 
 import android.content.ComponentCallbacks2;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.Uri;
-import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements PhotoGridFragment.OnPhotoGridInteractionListener,
@@ -150,7 +145,7 @@ public class MainActivity extends AppCompatActivity
 
             // Create fragment and give it an argument for the selected photo.
             EventListFragment newFragment = EventListFragment.newInstance(event.getId(),
-                    event.getTime(), event.getImageName(), event.getImageID());
+                    event.getTime(), event.getImagePath(), event.getImageID(), event.getName());
 
             if (mTimerEventExpired != null) {
                 newFragment.restartedFromNotification(mTimerEventExpired);

@@ -1,79 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="se.umu.cs.c12msr.imagetimer.ConfigureEvent">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="se.umu.cs.c12msr.imagetimer.ConfigureEvent"
+                android:focusableInTouchMode="true">
 
     <include
         android:id="@+id/activity_configure_event_tool_bar"
         layout="@layout/tool_bar"/>
 
-    <View
-        android:id="@+id/anchor"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_centerInParent="true"/>
-
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="210dp"
         android:id="@+id/activity_configure_event_image"
         android:layout_below="@+id/activity_configure_event_tool_bar"
         android:contentDescription="image" />
 
-
-    <NumberPicker
-        android:layout_width="100dp"
-        android:layout_height="160dp"
-        android:id="@+id/activity_ce_hours_picker"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/activity_configure_event_image"
-        android:descendantFocusability="blocksDescendants" />
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:id="@+id/linearLayout"
+        android:focusableInTouchMode="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hour"
-        android:id="@+id/hour_tv"
-        android:layout_gravity="center_vertical"
-        android:textSize="@dimen/text_size"
-        android:layout_toEndOf="@id/activity_ce_hours_picker"
-        android:layout_alignTop="@+id/activity_ce_hours_picker"
-        android:layout_marginTop="66dp"
-        android:layout_marginLeft="2dp" />
+        <NumberPicker
+            android:layout_width="100dp"
+            android:layout_height="140dp"
+            android:id="@+id/activity_ce_hours_picker"
+            android:descendantFocusability="blocksDescendants"
+            />
 
-    <NumberPicker
-        android:layout_width="100dp"
-        android:layout_height="160dp"
-        android:id="@+id/activity_ce_minutes_picker"
-        android:layout_gravity="center_vertical"
-        android:descendantFocusability="blocksDescendants"
-        android:layout_toEndOf="@id/hour_tv"
-        android:layout_below="@+id/activity_configure_event_image"
-        android:layout_marginLeft="2dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hour"
+            android:id="@+id/hour_tv"
+            android:layout_gravity="center_vertical"
+            android:textSize="@dimen/text_size"
+            android:layout_marginLeft="2dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/minutes"
-        android:id="@+id/min_tv"
-        android:layout_gravity="center_vertical"
-        android:layout_toEndOf="@id/activity_ce_minutes_picker"
-        android:layout_alignTop="@+id/activity_ce_minutes_picker"
-        android:layout_marginTop="66dp"
-        android:layout_marginLeft="2dp"
-        android:textSize="@dimen/text_size" />
+        <NumberPicker
+            android:layout_width="100dp"
+            android:layout_height="140dp"
+            android:id="@+id/activity_ce_minutes_picker"
+            android:layout_gravity="center_vertical"
+            android:descendantFocusability="blocksDescendants"
+            android:layout_marginLeft="2dp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@android:string/cancel"
-        android:id="@+id/activity_ce_cancel_button"
-        android:layout_gravity="center_vertical|bottom"
-        style="@style/Widget.AppCompat.Button"
-        android:layout_marginBottom="10dp"
-        android:onClick="cancelButtonPressed" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/minutes"
+            android:id="@+id/min_tv"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="2dp"
+            android:textSize="@dimen/text_size" />
+    </LinearLayout>
+
+
 
     <Button
         android:layout_width="wrap_content"
@@ -82,9 +70,35 @@
         android:id="@+id/activity_ce_ok_button"
         style="@style/AppTheme.Button.Colored"
         android:layout_gravity="center_vertical|bottom"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:onClick="confirmButtonPressed" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:onClick="confirmButtonPressed"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@android:string/cancel"
+        android:id="@+id/activity_ce_cancel_button"
+        android:layout_gravity="center_vertical|bottom"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_marginBottom="8dp"
+        android:onClick="cancelButtonPressed"
+        android:layout_toStartOf="@id/activity_ce_ok_button"
+        android:layout_alignParentBottom="true"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/name_tv"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="35dp"
+        android:hint="@string/name_tv_hint"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:inputType="textNoSuggestions|text"/>
 
 </RelativeLayout>

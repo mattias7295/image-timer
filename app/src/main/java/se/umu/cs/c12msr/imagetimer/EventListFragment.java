@@ -13,21 +13,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.SystemClock;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class EventListFragment extends Fragment implements EventListAdapter.OnEventListListener {
@@ -37,10 +32,11 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
     private static final String RUNNING_TIMER_EVENTS = "running_timer_events";
     private static final String CURRENT_COUNTER_VALUE = "current_counter_value";
 
-    private static final String ARG_ID      = "arg_id";
-    private static final String ARG_TIME    = "arg_time";
-    private static final String ARG_IMAGE   = "arg_image";
-    private static final String ARG_IMAGEID = "arg_imageid";
+    private static final String ARG_ID              = "arg_id";
+    private static final String ARG_TIME            = "arg_time";
+    private static final String ARG_IMAGE_PATH      = "arg_image_path";
+    private static final String ARG_IMAGEID         = "arg_imageid";
+    private static final String ARG_NAME            = "arg_name";
 
     private OnTimerEventInteractionListener mCallback;
     private ListView mListView;
@@ -101,12 +97,13 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         // Required empty public constructor
     }
 
-    public static EventListFragment newInstance(long id, long time, String imagePath, int imageId) {
+    public static EventListFragment newInstance(long id, long time, String imagePath, int imageId, String name) {
         Bundle args = new Bundle();
         args.putLong(ARG_ID, id);
         args.putLong(ARG_TIME, time);
-        args.putString(ARG_IMAGE, imagePath);
+        args.putString(ARG_IMAGE_PATH, imagePath);
         args.putInt(ARG_IMAGEID, imageId);
+        args.putString(ARG_NAME, name);
         EventListFragment fragment = new EventListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -121,10 +118,11 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         if (args != null) {
             long id = args.getLong(ARG_ID);
             long time = args.getLong(ARG_TIME);
-            String imageP = args.getString(ARG_IMAGE);
+            String imagePath = args.getString(ARG_IMAGE_PATH);
             int imageId = args.getInt(ARG_IMAGEID);
+            String name = args.getString(ARG_NAME);
 
-            TimerEvent event = new TimerEvent(id, imageP, time);
+            TimerEvent event = new TimerEvent(id, time, imagePath, name);
             event.setImageID(imageId);
             addEvent(event);
         }
@@ -268,7 +266,7 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         r.play();
 
         new AlertDialog.Builder(getActivity())
-                .setTitle(event.getImageName() + " has expired!")
+                .setTitle(event.getImagePath() + " has expired!")
                 .setMessage("Press ok to remove this timer")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
