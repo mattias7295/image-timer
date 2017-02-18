@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <se.umu.cs.c12msr.imagetimer.SquareImageView
+    <se.umu.cs.c12msr.imagetimer.main.SquareImageView
         android:id="@+id/grid_item_picture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

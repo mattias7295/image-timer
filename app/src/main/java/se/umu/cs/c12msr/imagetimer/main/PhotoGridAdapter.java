@@ -1,7 +1,6 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.content.Context;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,10 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;
+
+import se.umu.cs.c12msr.imagetimer.R;
+import se.umu.cs.c12msr.imagetimer.main.SquareImageView;
+import se.umu.cs.c12msr.imagetimer.main.TimerEvent;
 
 /**
  * Created by Mattias-stationary on 16-Aug-16.
@@ -55,7 +58,6 @@ public class PhotoGridAdapter extends BaseAdapter {
             frame = mInflater.inflate(R.layout.grid_item, parent, false);
             frame.setTag(R.id.grid_item_picture, frame.findViewById(R.id.grid_item_picture));
             frame.setTag(R.id.grid_item_text, frame.findViewById(R.id.grid_item_text));
-
         }
 
         TimerEvent event = getItem(position);
@@ -63,7 +65,11 @@ public class PhotoGridAdapter extends BaseAdapter {
         name = (TextView) frame.getTag(R.id.grid_item_text);
         name.setText(event.getName());
 
-        Picasso.with(mContext).load(event.getImagePath()).resize(80,80).centerCrop().into(picture);
+        File imageFile = new File(event.getImagePath());
+
+        if (imageFile.exists()) {
+            Picasso.with(mContext).load(imageFile).fit().into(picture);
+        }
         return frame;
     }
 

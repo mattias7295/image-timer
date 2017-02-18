@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.util;
 
 import android.os.Environment;
 

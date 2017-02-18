@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import se.umu.cs.c12msr.imagetimer.R;
 
 public class TimerService extends Service {
 

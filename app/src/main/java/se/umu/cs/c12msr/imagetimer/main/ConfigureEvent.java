@@ -1,15 +1,11 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,6 +14,8 @@ import android.widget.NumberPicker;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+
+import se.umu.cs.c12msr.imagetimer.R;
 
 public class ConfigureEvent extends AppCompatActivity {
 
@@ -30,7 +28,7 @@ public class ConfigureEvent extends AppCompatActivity {
     private ImageView mPictureView;
     private NumberPicker mHoursPicker;
     private NumberPicker mMinutesPicker;
-    private EditText mNameTV;
+    private EditText tvName;
 
 
     @Override
@@ -48,7 +46,7 @@ public class ConfigureEvent extends AppCompatActivity {
         }
 
         Intent intent = getIntent();
-        String imageFile = intent.getStringExtra(PhotoGridFragment.MESSAGE);
+        String imageFilePath = intent.getStringExtra(PhotoGridFragment.MESSAGE);
 
         mHoursPicker = (NumberPicker) findViewById(R.id.activity_ce_hours_picker);
         if (mHoursPicker != null) {
@@ -64,51 +62,30 @@ public class ConfigureEvent extends AppCompatActivity {
             mMinutesPicker.setWrapSelectorWheel(false);
         }
 
-        mNameTV = (EditText) findViewById(R.id.name_tv);
+        tvName = (EditText) findViewById(R.id.name_tv);
 
         mPictureView = (ImageView) findViewById(R.id.activity_configure_event_image);
 
+        File image = new File(imageFilePath);
+        if (image.exists()) {
+            Picasso.with(this).load(image).into(mPictureView);
+        }
+        /*
         if (StorageHelper.isExternalStorageReadable()) {
             File extDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
             final String imageFilePath;
             if (extDir != null) {
-                imageFilePath = extDir.getAbsolutePath() + "/" + imageFile;
+                imageFilePath = extDir.getAbsolutePath() + "/" + imageFilePath;
                 Picasso.with(this).load(imageFilePath).into(mPictureView);
             }
         }
-        /*
-        mPictureView.post(new Runnable() {
-            @Override
-            public void run() {
-                // Get the dimensions of the ImageView
-                int targetW = mPictureView.getWidth();
-                int targetH = mPictureView.getHeight();
-
-                // Get the dimensions of the bitmap
-                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                bmOptions.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(imageFilePath, bmOptions);
-                int photoW = bmOptions.outWidth;
-                int photoH = bmOptions.outHeight;
-
-                // Determine how much to scale down the image
-                int scaleFactor = Math.min(photoW/ targetW, photoH/ targetH);
-
-                // Decode the image file into a Bitmap sized to fill the View
-                bmOptions.inJustDecodeBounds = false;
-                bmOptions.inSampleSize = scaleFactor;
-
-                Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath, bmOptions);
-                mPictureView.setImageBitmap(bitmap);
-            }
-        });
         */
     }
 
     public void confirmButtonPressed(View view) {
         int hours = mHoursPicker.getValue();
         int minutes = mMinutesPicker.getValue();
-        String name = mNameTV.getText().toString();
+        String name = tvName.getText().toString();
 
         Intent intent = new Intent();
         intent.putExtra(HOURS_SET, hours);

@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -23,6 +23,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import se.umu.cs.c12msr.imagetimer.R;
 
 
 public class EventListFragment extends Fragment implements EventListAdapter.OnEventListListener {
@@ -182,8 +184,6 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         super.onResume();
         Log.i(TAG, "Register broadcast receiver");
         IntentFilter filter = new IntentFilter();
-        filter.addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
-        filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
         filter.addAction(TimerService.COUNTDOWN_BR);
         getActivity().registerReceiver(br, filter);
     }
@@ -266,7 +266,7 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         r.play();
 
         new AlertDialog.Builder(getActivity())
-                .setTitle(event.getImagePath() + " has expired!")
+                .setTitle(event.getName() + " has expired!")
                 .setMessage("Press ok to remove this timer")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {

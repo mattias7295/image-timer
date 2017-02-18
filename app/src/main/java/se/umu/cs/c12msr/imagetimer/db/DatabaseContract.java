@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.db;
 
 import android.provider.BaseColumns;
 

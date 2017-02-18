@@ -4,7 +4,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:orientation="vertical"
-             tools:context="se.umu.cs.c12msr.imagetimer.MainActivity">
+             tools:context=".main.MainActivity">
 
     <include layout="@layout/tool_bar"
              android:id="@+id/tool_bar"/>

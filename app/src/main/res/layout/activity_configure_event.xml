@@ -3,7 +3,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="se.umu.cs.c12msr.imagetimer.ConfigureEvent"
+                tools:context=".main.ConfigureEvent"
                 android:focusableInTouchMode="true">
 
     <include
@@ -90,7 +90,7 @@
         android:layout_alignParentBottom="true"/>
 
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/name_tv"
         android:layout_below="@+id/linearLayout"
@@ -99,6 +99,8 @@
         android:hint="@string/name_tv_hint"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:inputType="textNoSuggestions|text"/>
+        android:inputType="textNoSuggestions|text"
+        android:maxWidth="400dp"
+        android:minWidth="300dp" />
 
 </RelativeLayout>

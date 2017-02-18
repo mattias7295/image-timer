@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,9 +10,14 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import se.umu.cs.c12msr.imagetimer.R;
+import se.umu.cs.c12msr.imagetimer.main.SquareImageView;
+import se.umu.cs.c12msr.imagetimer.main.TimerEvent;
 
 /**
  * Created by c12msr on 12-Nov-16.
@@ -122,10 +127,15 @@ public class EventListAdapter extends BaseAdapter {
 
         public void setData(TimerEvent event) {
             timerEvent = event;
-            name.setText(timerEvent.getImagePath());
+            name.setText(timerEvent.getName());
 
             updateTimeRemaining();
-            Picasso.with(mContext).load(timerEvent.getImagePath()).into(picture);
+
+            File imageFile = new File(timerEvent.getImagePath());
+
+            if (imageFile.exists()) {
+                Picasso.with(mContext).load(imageFile).fit().into(picture);
+            }
         }
 
         public void updateTimeRemaining() {
@@ -134,7 +144,7 @@ public class EventListAdapter extends BaseAdapter {
                 countDownText.setText(String.format(Locale.ENGLISH, "%02d:%02d:%02d",
                         timeInSeconds/3600, (timeInSeconds%3600) / 60, timeInSeconds%60));
             } else {
-                countDownText.setText("Expired!!");
+                countDownText.setText(R.string.expired);
                 mCallback.handleTimerExpiration(timerEvent);
             }
         }

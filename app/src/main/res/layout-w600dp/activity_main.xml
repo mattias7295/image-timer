@@ -4,7 +4,7 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".MainActivity">
+                tools:context=".main.MainActivity">
 
         <include
             layout="@layout/tool_bar"
@@ -17,14 +17,14 @@
             android:orientation="horizontal">
 
                 <fragment
-                    android:name="se.umu.cs.c12msr.imagetimer.PhotoGridFragment"
+                    android:name="se.umu.cs.c12msr.imagetimer.main.PhotoGridFragment"
                     android:id="@+id/photo_grid_fragment"
                     android:layout_weight="2"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"/>
 
                 <fragment
-                    android:name="se.umu.cs.c12msr.imagetimer.EventListFragment"
+                    android:name="se.umu.cs.c12msr.imagetimer.main.EventListFragment"
                     android:id="@+id/timer_event_fragment"
                     android:layout_weight="1"
                     android:layout_width="0dp"

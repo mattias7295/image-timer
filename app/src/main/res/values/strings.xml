@@ -11,4 +11,5 @@
     <string name="notification_title">Image Timer notification</string>
     <string name="ok_button">Ok</string>
     <string name="name_tv_hint">Name</string>
+    <string name="expired">Expired!!</string>
 </resources>

@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -18,7 +18,7 @@ public class TimerEvent implements Cloneable, Parcelable {
     private long mTimeLeft;
     private long mTimerId;
 
-    //TODO: temp image
+    //TODO: remove this when finished
     private int mImageID;
 
     public TimerEvent(long id, long time, String imagePath, String name) {

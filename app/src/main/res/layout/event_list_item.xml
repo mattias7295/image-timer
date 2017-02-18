@@ -4,7 +4,7 @@
               android:layout_height="match_parent"
               android:orientation="horizontal">
 
-    <se.umu.cs.c12msr.imagetimer.SquareImageView
+    <se.umu.cs.c12msr.imagetimer.main.SquareImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/event_list_image"

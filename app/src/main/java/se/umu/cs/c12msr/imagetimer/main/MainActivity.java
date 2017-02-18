@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.content.ComponentCallbacks2;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import se.umu.cs.c12msr.imagetimer.R;
 
 public class MainActivity extends AppCompatActivity
         implements PhotoGridFragment.OnPhotoGridInteractionListener,

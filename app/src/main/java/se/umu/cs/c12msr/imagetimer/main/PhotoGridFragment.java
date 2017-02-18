@@ -1,4 +1,4 @@
-package se.umu.cs.c12msr.imagetimer;
+package se.umu.cs.c12msr.imagetimer.main;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
@@ -26,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import se.umu.cs.c12msr.imagetimer.R;
+import se.umu.cs.c12msr.imagetimer.db.DatabaseHelper;
 
 
 public class PhotoGridFragment extends Fragment {
@@ -52,7 +53,6 @@ public class PhotoGridFragment extends Fragment {
      *
      * @return A new instance of fragment PhotoGridFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static PhotoGridFragment newInstance() {
         PhotoGridFragment fragment = new PhotoGridFragment();
         return fragment;
@@ -64,7 +64,6 @@ public class PhotoGridFragment extends Fragment {
         if (getArguments() != null) {
         }
 
-        // TODO: Use these on real demo
         dbHelper = new DatabaseHelper(getActivity());
         mTimerEvents  = dbHelper.fetchAllEvents();
 
@@ -205,7 +204,7 @@ public class PhotoGridFragment extends Fragment {
         void onPhotoGridInteraction(TimerEvent event);
     }
 
-    //TODO: temp way to create events
+    //TODO: remove this when finished
     private List<TimerEvent> createTempEvents() {
         ArrayList<TimerEvent> tmp = new ArrayList<>();
         for (int i = 0; i < mTestImageIds.length; i++) {
@@ -216,7 +215,7 @@ public class PhotoGridFragment extends Fragment {
         return tmp;
     }
 
-    // FOR TESTING
+    // TODO: remove this when finished
     private Integer mTestImageIds[] = {
             R.drawable.blue, R.drawable.red,
             R.drawable.green, R.drawable.cyan};
