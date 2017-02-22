@@ -5,4 +5,9 @@
         android:id="@+id/action_settings"
         android:title="Settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/badge"
+        android:title="notification"
+        android:icon="@drawable/shape_notification"
+        app:showAsAction="ifRoom" />
 </menu>

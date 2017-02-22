@@ -64,11 +64,11 @@ public class PhotoGridFragment extends Fragment {
         if (getArguments() != null) {
         }
 
-        dbHelper = new DatabaseHelper(getActivity());
-        mTimerEvents  = dbHelper.fetchAllEvents();
+        //dbHelper = new DatabaseHelper(getActivity());
+        //mTimerEvents  = dbHelper.fetchAllEvents();
 
         // FOR TESTING
-        //mTimerEvents = createTempEvents();
+        mTimerEvents = createTempEvents();
     }
 
     @Override
@@ -141,10 +141,12 @@ public class PhotoGridFragment extends Fragment {
                             minutes * 60 * 1000;
 
                 /* insert value in db and create TimerEvent */
+                //TODO: testing
+                /*
                 long id = dbHelper.blockingInsert(mCurrentPhoto, time, name);
                 TimerEvent te = new TimerEvent(id, time, mCurrentPhoto, name);
                 ((PhotoGridAdapter) mPictureGrid.getAdapter()).addEvent(te);
-
+                */
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 removeFile(mCurrentPhoto);
             }

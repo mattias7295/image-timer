@@ -65,11 +65,16 @@ public class PhotoGridAdapter extends BaseAdapter {
         name = (TextView) frame.getTag(R.id.grid_item_text);
         name.setText(event.getName());
 
+        /*
         File imageFile = new File(event.getImagePath());
 
         if (imageFile.exists()) {
             Picasso.with(mContext).load(imageFile).fit().into(picture);
         }
+        */
+
+        //TODO: testing
+        Picasso.with(mContext).load(event.getImageID()).fit().into(picture);
         return frame;
     }
 

@@ -31,13 +31,11 @@ public class EventListAdapter extends BaseAdapter {
     private List<TimerEvent> mEvents;
 
 
-
     final private List<ViewHolder> lstHolders;
 
 
     public interface OnEventListListener {
         void handleRemovePressed(TimerEvent event);
-        void handleTimerExpiration(TimerEvent event);
     }
 
     private OnEventListListener mCallback;
@@ -94,8 +92,8 @@ public class EventListAdapter extends BaseAdapter {
             public void onClick(View v) {
                 TimerEvent event = getItem(position);
                 mEvents.remove(event);
-                mCallback.handleRemovePressed(event);
                 notifyDataSetChanged();
+                mCallback.handleRemovePressed(event);
             }
         });
 
@@ -104,17 +102,10 @@ public class EventListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void updateTimers(long timeLeft[]) {
-        //TODO: try to find better solution for this.
-        for (int i = 0; i < timeLeft.length; i+=2) {
-            for (int j = 0; j < lstHolders.size(); j++) {
-                ViewHolder holder = lstHolders.get(j);
-                if (holder.timerEvent.getTimerId() == timeLeft[i]) {
-                    holder.timerEvent.setTimer(timeLeft[i+1]);
-                    holder.updateTimeRemaining();
-                    break;
-                }
-            }
+    public void update() {
+        for (ViewHolder holder :
+                lstHolders) {
+            holder.updateTimeRemaining();
         }
     }
 
@@ -130,12 +121,15 @@ public class EventListAdapter extends BaseAdapter {
             name.setText(timerEvent.getName());
 
             updateTimeRemaining();
-
+            /*
             File imageFile = new File(timerEvent.getImagePath());
 
             if (imageFile.exists()) {
                 Picasso.with(mContext).load(imageFile).fit().into(picture);
             }
+            */
+            //TODO: testing
+            Picasso.with(mContext).load(timerEvent.getImageID()).fit().into(picture);
         }
 
         public void updateTimeRemaining() {
@@ -145,7 +139,6 @@ public class EventListAdapter extends BaseAdapter {
                         timeInSeconds/3600, (timeInSeconds%3600) / 60, timeInSeconds%60));
             } else {
                 countDownText.setText(R.string.expired);
-                mCallback.handleTimerExpiration(timerEvent);
             }
         }
 

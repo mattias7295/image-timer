@@ -53,6 +53,8 @@ public class TimerService extends Service {
 
     @Override
     public void onCreate() {
+        Log.i(TAG, "onCreate: service created");
+
         mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mIsRunning = false;
 
