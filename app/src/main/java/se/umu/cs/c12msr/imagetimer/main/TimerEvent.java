@@ -90,11 +90,6 @@ public class TimerEvent implements Cloneable, Parcelable {
         return (TimerEvent) super.clone();
     }
 
-    @Override
-    public String toString() {
-        return "TimerEvent{" + mTime +'}';
-    }
-
 
     @Override
     public int describeContents() {

@@ -26,6 +26,7 @@
                 <fragment
                     android:name="se.umu.cs.c12msr.imagetimer.main.EventListFragment"
                     android:id="@+id/timer_event_fragment"
+                    android:tag="@string/event_list_fragment_tag"
                     android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"/>

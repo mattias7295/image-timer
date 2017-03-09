@@ -12,7 +12,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
@@ -37,6 +36,9 @@ import se.umu.cs.c12msr.imagetimer.R;
 public class MainActivity extends AppCompatActivity
         implements PhotoGridFragment.OnPhotoGridInteractionListener,
         EventListFragment.OnTimerEventInteractionListener {
+
+    private static final String RUNNING_TIMER_EVENTS = "running_timer_events";
+    private static final String CURRENT_COUNTER_VALUE = "current_counter_value";
 
     public static final String TIMER_ID_EXPIRED = "timer.id.expired";
 
@@ -91,9 +93,9 @@ public class MainActivity extends AppCompatActivity
                 if (intent.getExtras() != null) {
                     long timeLeft[] = intent.getLongArrayExtra(TimerService.TIME_LEFT);
                     updateTimers(timeLeft);
-
+                    String tag = getString(R.string.event_list_fragment_tag);
                     EventListFragment eventListFragment = (EventListFragment) getSupportFragmentManager()
-                            .findFragmentByTag(EventListFragment.class.getName());
+                            .findFragmentByTag(tag);
                     if (eventListFragment != null) {
                         // Update list if the fragment is available
                         eventListFragment.update();
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity
         activeEvents = new HashMap<>();
         eventId = 0L;
         // bind TimerService
+        Log.i(TAG, "onCreate: bind service");
         doBindService();
 
         // use custom toolbar.
@@ -168,7 +171,7 @@ public class MainActivity extends AppCompatActivity
             // Create an instance of PhotoGridFragment
             PhotoGridFragment pgf = PhotoGridFragment.newInstance();
 
-            String tag = PhotoGridFragment.class.getName();
+            String tag = getString(R.string.photo_grid_fragment_tag);
             // In case this activity was started with special instructions
             // from an Intent, pass the Intent's extras to the fragment as
             // arguments
@@ -195,6 +198,7 @@ public class MainActivity extends AppCompatActivity
         isAppForeground = true;
         IntentFilter filter = new IntentFilter();
         filter.addAction(TimerService.COUNTDOWN_BR);
+        Log.i(TAG, "onResume: register receiver");
         registerReceiver(br, filter);
     }
 
@@ -203,6 +207,18 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         doUnbindService();
         unregisterReceiver(br);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        ArrayList<TimerEvent> list = new ArrayList<>(activeEvents.values());
+        outState.putParcelableArrayList(RUNNING_TIMER_EVENTS, list);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -231,22 +247,25 @@ public class MainActivity extends AppCompatActivity
         inflater.inflate(R.menu.mainmenu, menu);
 
         MenuItem item = menu.findItem(R.id.badge);
-        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
-        Button eventCountButton = (Button) MenuItemCompat.getActionView(item);
-        eventCountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventListFragment eventListFragment = (EventListFragment) getSupportFragmentManager()
-                        .findFragmentByTag(EventListFragment.class.getName());
-                if (eventListFragment == null) {
-                    EventListFragment newFragment = EventListFragment.newInstance();
-                    newFragment.setActiveEventList(new ArrayList<>(activeEvents.values()));
-                    String tag = EventListFragment.class.getName();
-                    replaceWithFragment(tag, newFragment);
+        if (item != null) {
+            MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+            Button eventCountButton = (Button) MenuItemCompat.getActionView(item);
+            eventCountButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String tag = getString(R.string.event_list_fragment_tag);
+                    EventListFragment eventListFragment = (EventListFragment) getSupportFragmentManager()
+                            .findFragmentByTag(tag);
+                    if (eventListFragment == null) {
+                        EventListFragment newFragment = EventListFragment.newInstance(new ArrayList<TimerEvent>(activeEvents.values()));
+
+                        replaceWithFragment(tag, newFragment);
+                    }
                 }
-            }
-        });
-        eventCountButton.setText(String.valueOf(eventCount));
+            });
+            eventCountButton.setText(String.valueOf(eventCount));
+        }
+
         return true;
     }
 
@@ -255,6 +274,7 @@ public class MainActivity extends AppCompatActivity
         //TODO: fill menu later if needed.
         switch (item.getItemId()) {
             case R.id.action_settings:
+                Toast.makeText(MainActivity.this, "Not implemented", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -267,11 +287,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPhotoGridInteraction(TimerEvent event) {
         // The user selected a photo from the PhotoGridFragment
-        addEvent(event);
-
+        TimerEvent activeEvent = createEvent(event);
+        Log.i(TAG, "onPhotoGridInteraction: referense: " + activeEvent.toString());
         eventCount++;
         invalidateOptionsMenu();
-        String tag = EventListFragment.class.getName();
+        String tag = getString(R.string.event_list_fragment_tag);
 
         EventListFragment eventListFragment = (EventListFragment) getSupportFragmentManager()
                 .findFragmentByTag(tag);
@@ -279,13 +299,12 @@ public class MainActivity extends AppCompatActivity
 
         if (eventListFragment != null) {
             // if the fragment is available, we're in two-pane layout.
-            eventListFragment.update();
+            eventListFragment.addActiveEvent(activeEvent);
         } else {
             // One-pane layout.
-                Log.i(TAG, "onPhotoGridInteraction: creating new EventListFragment");
                 // Create fragment and give it an argument for the selected photo.
-                EventListFragment newFragment = EventListFragment.newInstance();
-                newFragment.setActiveEventList(new ArrayList<>(activeEvents.values()));
+                EventListFragment newFragment = EventListFragment.newInstance(new ArrayList<TimerEvent>(activeEvents.values()));
+                //newFragment.setActiveEvents(activeEvents.values());
                 if (mTimerEventExpired != null) {
                     newFragment.restartedFromNotification(mTimerEventExpired);
                     mTimerEventExpired = null;
@@ -303,7 +322,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private void addEvent(TimerEvent event) {
+    private TimerEvent createEvent(TimerEvent event) {
         try {
             //TODO: total hack...
             TimerEvent clone = event.clone();
@@ -312,9 +331,12 @@ public class MainActivity extends AppCompatActivity
             activeEvents.put(eventId, clone);
             mTimerService.addTimerEvent(eventId, clone.getTime());
             eventId++;
+            return clone;
         } catch (CloneNotSupportedException e) {
             // Can't happen
+            Log.d(TAG, "createEvent: Could not clone TimerEvent");
         }
+        return null;
     }
 
     private void updateTimers(long[] timeLeft) {
@@ -328,13 +350,13 @@ public class MainActivity extends AppCompatActivity
             } else  {
                 mTimerService.removeTimerEvent(timeLeft[i]);
             }
-
         }
     }
 
 
     @Override
     public void onTimerEventInteraction(TimerEvent event) {
+        mTimerService.removeTimerEvent(event.getTimerId());
         activeEvents.remove(event.getTimerId());
         eventCount--;
         invalidateOptionsMenu();

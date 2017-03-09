@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import se.umu.cs.c12msr.imagetimer.R;
@@ -32,14 +33,9 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
 
     private static final String TAG = "EventListFragment";
 
-    private static final String RUNNING_TIMER_EVENTS = "running_timer_events";
-    private static final String CURRENT_COUNTER_VALUE = "current_counter_value";
 
-    private static final String ARG_ID              = "arg_id";
-    private static final String ARG_TIME            = "arg_time";
-    private static final String ARG_IMAGE_PATH      = "arg_image_path";
-    private static final String ARG_IMAGEID         = "arg_imageid";
-    private static final String ARG_NAME            = "arg_name";
+    public static final String ARG_NEW_EVENT = "arg_new_event";
+    public static final String ARG_ACTIVE_EVENTS = "arg_active_events";
 
     private OnTimerEventInteractionListener mCallback;
     private ListView mListView;
@@ -53,27 +49,38 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         // Required empty public constructor
     }
 
-    public static EventListFragment newInstance(long id, long time, String imagePath,
-                                                int imageId, String name) {
+    public static EventListFragment newInstance(TimerEvent event) {
         Bundle args = new Bundle();
-        args.putLong(ARG_ID, id);
-        args.putLong(ARG_TIME, time);
-        args.putString(ARG_IMAGE_PATH, imagePath);
-        args.putInt(ARG_IMAGEID, imageId);
-        args.putString(ARG_NAME, name);
+        args.putParcelable(ARG_NEW_EVENT, event);
         EventListFragment fragment = new EventListFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static EventListFragment newInstance() {
-        return new EventListFragment();
+    public static EventListFragment newInstance(ArrayList<TimerEvent> activeEvents) {
+        Bundle args = new Bundle();
+        args.putParcelableArrayList(ARG_ACTIVE_EVENTS, activeEvents);
+        EventListFragment fragment = new EventListFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mEvents = new ArrayList<>();
 
+        Bundle args = getArguments();
+        if (args != null) {
+            TimerEvent event = args.getParcelable(ARG_NEW_EVENT);
+            if (event != null) {
+                mEvents.add(event);
+            }
+            ArrayList<TimerEvent> events = args.getParcelableArrayList(ARG_ACTIVE_EVENTS);
+            if (events != null) {
+                mEvents.addAll(events);
+            }
+        }
     }
 
     @Override
@@ -85,17 +92,8 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         mListView = (ListView) view.findViewById(R.id.fragment_timerevent_lv);
         mListView.setAdapter(mAdapter);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            long id = args.getLong(ARG_ID);
-            long time = args.getLong(ARG_TIME);
-            String imagePath = args.getString(ARG_IMAGE_PATH);
-            int imageId = args.getInt(ARG_IMAGEID);
-            String name = args.getString(ARG_NAME);
 
-            TimerEvent event = new TimerEvent(id, time, imagePath, name);
-            event.setImageID(imageId);
-        }
+
         return view;
     }
 
@@ -134,8 +132,14 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
         ((EventListAdapter)mListView.getAdapter()).notifyDataSetChanged();
     }
 
-    public void setActiveEventList(List<TimerEvent> list) {
-        this.mEvents = list;
+    public void addActiveEvent(TimerEvent event) {
+        mEvents.add(event);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void setActiveEvents(Collection<TimerEvent> events) {
+        mEvents.addAll(events);
+        mAdapter.notifyDataSetChanged();
     }
 
 

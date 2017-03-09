@@ -12,4 +12,7 @@
     <string name="ok_button">Ok</string>
     <string name="name_tv_hint">Name</string>
     <string name="expired">Expired!!</string>
+
+    <string name="event_list_fragment_tag">elf-tag</string>
+    <string name="photo_grid_fragment_tag">pgf-tag</string>
 </resources>

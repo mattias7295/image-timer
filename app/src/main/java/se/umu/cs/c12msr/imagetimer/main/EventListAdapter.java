@@ -1,6 +1,7 @@
 package se.umu.cs.c12msr.imagetimer.main;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +72,7 @@ public class EventListAdapter extends BaseAdapter {
         TimerEvent event = getItem(position);
 
         if (convertView == null) {
+
             holder = new ViewHolder();
             convertView = mInflater.inflate(R.layout.event_list_item, parent, false);
             holder.name = (TextView) convertView.findViewById(R.id.event_list_text);
@@ -83,6 +85,8 @@ public class EventListAdapter extends BaseAdapter {
             synchronized (lstHolders) {
                 lstHolders.add(holder);
             }
+            //Log.i(TAG, "getView: creating new listviewitem");
+            //Log.i(TAG, "getView: lstholder size:  " + lstHolders.size());
         } else {
             holder = (ViewHolder) convertView.getTag();
 
@@ -134,6 +138,7 @@ public class EventListAdapter extends BaseAdapter {
 
         public void updateTimeRemaining() {
             long timeInSeconds = timerEvent.getTimeLeft()/1000;
+            //Log.i(TAG, "updateTimeRemaining: time left: " + timeInSeconds);
             if (timeInSeconds >= 0) {
                 countDownText.setText(String.format(Locale.ENGLISH, "%02d:%02d:%02d",
                         timeInSeconds/3600, (timeInSeconds%3600) / 60, timeInSeconds%60));
