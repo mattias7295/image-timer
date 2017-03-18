@@ -66,20 +66,13 @@ public class ConfigureEvent extends AppCompatActivity {
 
         mPictureView = (ImageView) findViewById(R.id.activity_configure_event_image);
 
+        /*
         File image = new File(imageFilePath);
         if (image.exists()) {
             Picasso.with(this).load(image).into(mPictureView);
         }
-        /*
-        if (StorageHelper.isExternalStorageReadable()) {
-            File extDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            final String imageFilePath;
-            if (extDir != null) {
-                imageFilePath = extDir.getAbsolutePath() + "/" + imageFilePath;
-                Picasso.with(this).load(imageFilePath).into(mPictureView);
-            }
-        }
         */
+        Picasso.with(this).load(R.drawable.blue).into(mPictureView);
     }
 
     public void confirmButtonPressed(View view) {

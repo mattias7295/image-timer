@@ -59,8 +59,7 @@ public class TimerService extends Service {
         mIsRunning = false;
 
         mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "MyWakelockTag");
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakelockTag");
 
         mTimerEvents = new Hashtable<>();
     }
@@ -74,8 +73,10 @@ public class TimerService extends Service {
     @Override
     public void onDestroy() {
         mNM.cancel(NOTIFICATION);
-        Toast.makeText(this, R.string.timer_service_started, Toast.LENGTH_SHORT).show();
-        mWakeLock.release();
+        Log.i(TAG, "onDestroy: cancel notification and release lock");
+        if (mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
     }
 
     @Override
@@ -100,6 +101,7 @@ public class TimerService extends Service {
     public boolean hasTimerEventExpired(long key) {
         return !mTimerEvents.containsKey(key);
     }
+
 
 
     private void startUpdateTimer() {
@@ -174,11 +176,14 @@ public class TimerService extends Service {
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentTitle(title)  // the label of the entry
                 .setContentText(text)  // the contents of the entry
+                .setCategory(Notification.CATEGORY_ALARM)
                 .setSound(soundUri)
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 .build();
 
         // Send the notification.
         mNM.notify(NOTIFICATION, notification);
+
     }
 }

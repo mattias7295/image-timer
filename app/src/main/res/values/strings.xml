@@ -15,4 +15,5 @@
 
     <string name="event_list_fragment_tag">elf-tag</string>
     <string name="photo_grid_fragment_tag">pgf-tag</string>
+    <string name="remove">Remove</string>
 </resources>

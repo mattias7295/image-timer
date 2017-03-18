@@ -121,17 +121,6 @@ public class EventListFragment extends Fragment implements EventListAdapter.OnEv
     }
 
 
-    public void restartedFromNotification(long timerEventId) {
-        for (TimerEvent event : mEvents) {
-            if (event.getTimerId() == timerEventId) {
-                // set expired
-                event.setTimer(-1L);
-                break;
-            }
-        }
-        ((EventListAdapter)mListView.getAdapter()).notifyDataSetChanged();
-    }
-
     public void addActiveEvent(TimerEvent event) {
         mEvents.add(event);
         mAdapter.notifyDataSetChanged();

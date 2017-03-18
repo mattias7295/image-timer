@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="2"
-        android:gravity="end"
+        android:gravity="bottom|end"
         android:paddingTop="5dp"
         android:paddingBottom="2dp"
         android:paddingStart="2dp"
@@ -39,8 +39,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/event_list_remove_button"
-        android:text="Avbryt"
-        android:textSize="@dimen/text_size"
+        android:text="@string/remove"
+        android:textSize="@dimen/text_size_small"
         android:layout_weight="2"/>
 
 </LinearLayout>

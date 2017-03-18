@@ -148,12 +148,13 @@ public class PhotoGridFragment extends Fragment {
                 ((PhotoGridAdapter) mPictureGrid.getAdapter()).addEvent(te);
                 */
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                removeFile(mCurrentPhoto);
+                //removeFile(mCurrentPhoto);
             }
         }
     }
 
     private void takePhoto() {
+        /*
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File photoFile = null;
         try {
@@ -170,6 +171,11 @@ public class PhotoGridFragment extends Fragment {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
         }
+        */
+
+        Intent intent = new Intent(getActivity(), ConfigureEvent.class);
+        intent.putExtra(MESSAGE, "bla");
+        startActivityForResult(intent, REQUEST_CONFIGURE_EVENT);
     }
 
     private File createImageFile() throws IOException {

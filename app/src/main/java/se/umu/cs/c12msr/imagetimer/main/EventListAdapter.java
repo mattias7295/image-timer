@@ -138,7 +138,6 @@ public class EventListAdapter extends BaseAdapter {
 
         public void updateTimeRemaining() {
             long timeInSeconds = timerEvent.getTimeLeft()/1000;
-            //Log.i(TAG, "updateTimeRemaining: time left: " + timeInSeconds);
             if (timeInSeconds >= 0) {
                 countDownText.setText(String.format(Locale.ENGLISH, "%02d:%02d:%02d",
                         timeInSeconds/3600, (timeInSeconds%3600) / 60, timeInSeconds%60));
